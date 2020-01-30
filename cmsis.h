@@ -47,9 +47,9 @@
 
 #define ARM_VEC16
 
-#ifndef ARM_VEC16   
+#ifndef ARM_VEC16
 
-   
+
 #define __PKHBT(ARG1,ARG2,ARG3)          ( ((((uint32_t)(ARG1))          ) & 0x0000FFFFUL) |  \
                                            ((((uint32_t)(ARG2)) << (ARG3)) & 0xFFFF0000UL)  )
 
@@ -84,7 +84,7 @@ static inline int32_t __SMULWB(int32_t x, int32_t y) {
 static inline int32_t __SMULWT(int32_t x, int32_t y) {
   return(((int64_t)x * (int64_t)(y >> 16)) >> 16);
 }
-   
+
 static inline int32_t __SMUAD(int32_t x, int32_t y) {
   return((int32_t)((int16_t) x) * (int32_t)((int16_t) y)
 	 + (x >> 16)* (y >> 16));
@@ -122,7 +122,7 @@ static inline int32_t __SMLAWT(int32_t x, int32_t y, int32_t z) {
   return((((int64_t)x * (int64_t)(y >> 16)) >> 16) + z);
 }
 
- 
+
 static inline int32_t __SMLAD(int32_t x, int32_t y, int32_t z) {
   return((int32_t)((int16_t) x) * (int32_t)((int16_t) y)
 	 + (x >> 16)* (y >> 16) + z);
@@ -190,9 +190,9 @@ static inline int32_t __SMLSDX(int32_t x, int32_t y, int32_t z) {
 #define __SEL                             __sel
 #define __QADD                            __qadd
 #define __QSUB                            __qsub
- 
 
-#else   
+
+#else
 /* GNU gcc specific functions */
 __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SADD8(uint32_t op1, uint32_t op2)
 {
@@ -835,12 +835,26 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMLAWT (uint32_t o
 }
 
 
+#define __BFI(RES, ARG1, ARG2, ARG3) \
+({                          \
+  uint32_t __RES = (RES), __ARG1 = (ARG1); \
+  __ASM ("bfi %0, %1, %2, %3" : "=r" (__RES) : "r" (__ARG1), "I" (ARG2), "I" (ARG3) : "cc" ); \
+  __RES; \
+})
+
 #define __ROR(ARG1,ARG2) \
 ({                          \
   uint32_t __RES, __ARG1 = (ARG1); \
   __ASM ("ror %0, %1, %2" : "=r" (__RES) :  "r" (__ARG1), "I" (ARG2) : "cc" ); \
   __RES; \
  })
+
+#define __EOR_LSR(ARG1, ARG2, ARG3) \
+({                          \
+  uint32_t __RES, __ARG1 = (ARG1), __ARG2 = (ARG2); \
+  __ASM ("eor %0, %1, %2, lsr %3" : "=r" (__RES) : "r" (__ARG1), "r" (__ARG2), "I" (ARG3) : "cc" ); \
+  __RES; \
+})
 
 #define __ORR_ROR(ARG1,ARG2,ARG3) \
 ({                          \
@@ -929,7 +943,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __MLS (int32_t op1, 
 }
 
 #endif
-   
+
 
 #ifdef __cplusplus
 }

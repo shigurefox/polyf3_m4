@@ -1953,14 +1953,15 @@ void hybrid_mult_32x32(int32_t *cf, uint32_t *c_from1, uint32_t *f_from1) {
     *(cf++) = 0;
 }
 
+static inline void swapptr(uint32_t **ptr1, uint32_t **ptr2) {
+    void *tmp = *ptr1;
+    *ptr1 = *ptr2;
+    *ptr2 = tmp;
+}
+
 void polyf3_divstep(int32_t delta, uint32_t *tritIn1, uint32_t *tritIn2) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
     uint32_t *readOp1, *readOp2, *writeOp;
-
-    if ((delta > 0) && (r2 & 1 != 0)) {
-        swapptr(&tritIn1, &tritIn2);
-        delta = -delta;
-    }
     readOp1 = tritIn1;
     readOp2 = tritIn2;
     r0 = *(readOp1); // a0
@@ -1968,6 +1969,12 @@ void polyf3_divstep(int32_t delta, uint32_t *tritIn1, uint32_t *tritIn2) {
     r2 = *(readOp2); // b0
     r3 = *(readOp2+1); // b1
 
+    if ((delta > 0) && ((r2 & 1) != 0)) {
+        swapptr(&tritIn1, &tritIn2);
+        delta = -delta;
+    }
+    delta++;
+    
     // c = f[0] * g[0]
     r4 = r0 & r2;
     r8 = r1 ^ r3;
@@ -1994,31 +2001,35 @@ void polyf3_divstep(int32_t delta, uint32_t *tritIn1, uint32_t *tritIn2) {
     *(writeOp++) = r3 >> 1;
 }
 
+
 // assert input size = 32
 void polyf3_jump32divsteps(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t **uvrs) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
     uint32_t *readOp1, *readOp2, *writeOp, *u, *v, *r, *s;
+    readOp1 = tritIn1;
+    readOp2 = tritIn2;
+    r0 = *(readOp1); // a0
+    r1 = *(readOp1+1); // a1
+    r2 = *(readOp2); // b0
+    r3 = *(readOp2+1); // b1
+    u = uvrs[0];
+    v = uvrs[1];
+    r = uvrs[2];
+    s = uvrs[3];
 
     int delta = d;
     for (int i = 32; i > 0; i--) {
-        if ((delta > 0) && (r2 & 1 != 0)) {
+        if ((delta > 0) && ((r2 & 1) != 0)) {
             swapptr(&tritIn1, &tritIn2);
             swapptr(&uvrs[0], &uvrs[2]);
             swapptr(&uvrs[1], &uvrs[3]);
             delta = -delta;
         }
-        readOp1 = tritIn1;
-        readOp2 = tritIn2;
-        r0 = *(readOp1); // a0
-        r1 = *(readOp1+1); // a1
-        r2 = *(readOp2); // b0
-        r3 = *(readOp2+1); // b1
-        u = uvrs[0];
-        v = uvrs[1];
-        r = uvrs[2];
-        s = uvrs[3];
+        delta++;
+        writeOp = tritIn2;
 
-        // c = f[0] * g[0]
+        // c = f[0]^(-1) * g[0] = f[0] * g[0] (mod 3)
+        // duplicate with sbfx to do 32 scalar mults at a time
         r4 = r0 & r2;
         r8 = r1 ^ r3;
         r5 = r4 & r8;
