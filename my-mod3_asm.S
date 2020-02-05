@@ -230,24 +230,24 @@ unit_unpack:
 .type polyf3_add_packed_asm, %function
 @ void polyf3_add_packed_asm(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2)
 polyf3_add_packed_asm:
+  ldr.w r4, [r1], #4
+  ldr.w r5, [r1], #4
+  ldr.w r6, [r2], #4
+  ldr.w r7, [r2], #4
+  ldr.w r8, [r1], #4
+  ldr.w r9, [r1], #4
+  ldr.w r10, [r2], #4
+  ldr.w r11, [r2], #4
+  eor.w r12, r5, r6
+  eor.w r5, r4, r7
+  and.w r5, r5, r12
+  eor.w r12, r12, r7
+  eor.w r4, r4, r6
+  orr.w r4, r4, r12
+  eor.w r12, r9, r10
+  eor.w r9, r8, r11
+  and.w r9, r9, r12
   push.w {r4-r12, lr}
-  ldr.w r4, [r1], #4
-  ldr.w r5, [r1], #4
-  ldr.w r6, [r2], #4
-  ldr.w r7, [r2], #4
-  ldr.w r8, [r1], #4
-  ldr.w r9, [r1], #4
-  ldr.w r10, [r2], #4
-  ldr.w r11, [r2], #4
-  eor.w r12, r5, r6
-  eor.w r5, r4, r7
-  and.w r5, r5, r12
-  eor.w r12, r12, r7
-  eor.w r4, r4, r6
-  orr.w r4, r4, r12
-  eor.w r12, r9, r10
-  eor.w r9, r8, r11
-  and.w r9, r9, r12
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -272,6 +272,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -296,6 +297,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -320,6 +322,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -344,6 +347,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -368,6 +372,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -392,6 +397,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -416,6 +422,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -440,6 +447,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -464,6 +472,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -488,6 +497,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -512,6 +522,7 @@ polyf3_add_packed_asm:
   eor.w r12, r9, r10
   eor.w r9, r8, r11
   and.w r9, r9, r12
+  push.w {r4-r12, lr}
   eor.w r12, r12, r11
   eor.w r8, r8, r10
   orr.w r8, r8, r12
@@ -1248,4 +1259,157 @@ unit_mul:
   cmp.w r0, r3
   bne.w unit_mul
   pop.w {r4-r12, pc}
+
+.global polyf3_ror767_asm
+.type polyf3_ror767_asm, %function
+@ void polyf3_ror767_asm(uint32_t *tritIn)
+polyf3_ror767_asm:
+  push {r4-r12, lr}
+  adds r3, #0
+  ldr r3, [r0, #0]
+  ldr r4, [r0, #8]
+  ldr r5, [r0, #16]
+  ldr r6, [r0, #24]
+  ldr r7, [r0, #32]
+  ldr r8, [r0, #40]
+  ldr r9, [r0, #48]
+  ldr r10, [r0, #56]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
+  str r3, [r0, #0]
+  str r4, [r0, #8]
+  str r5, [r0, #16]
+  str r6, [r0, #24]
+  str r7, [r0, #32]
+  str r8, [r0, #40]
+  str r9, [r0, #48]
+  str r10, [r0, #56]
+  ldr r3, [r0, #64]
+  ldr r4, [r0, #72]
+  ldr r5, [r0, #80]
+  ldr r6, [r0, #88]
+  ldr r7, [r0, #96]
+  ldr r8, [r0, #104]
+  ldr r9, [r0, #112]
+  ldr r10, [r0, #120]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
+  str r3, [r0, #64]
+  str r4, [r0, #72]
+  str r5, [r0, #80]
+  str r6, [r0, #88]
+  str r7, [r0, #96]
+  str r8, [r0, #104]
+  str r9, [r0, #112]
+  str r10, [r0, #120]
+  ldr r3, [r0, #128]
+  ldr r4, [r0, #136]
+  ldr r5, [r0, #144]
+  ldr r6, [r0, #152]
+  ldr r7, [r0, #160]
+  ldr r8, [r0, #168]
+  ldr r9, [r0, #176]
+  ldr r10, [r0, #184]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
+  str r3, [r0, #128]
+  str r4, [r0, #136]
+  str r5, [r0, #144]
+  str r6, [r0, #152]
+  str r7, [r0, #160]
+  str r8, [r0, #168]
+  str r9, [r0, #176]
+  str r10, [r0, #184]
+  adds r3, #0
+  ldr r3, [r0, #4]
+  ldr r4, [r0, #12]
+  ldr r5, [r0, #20]
+  ldr r6, [r0, #28]
+  ldr r7, [r0, #36]
+  ldr r8, [r0, #44]
+  ldr r9, [r0, #52]
+  ldr r10, [r0, #60]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
+  str r3, [r0, #4]
+  str r4, [r0, #12]
+  str r5, [r0, #20]
+  str r6, [r0, #28]
+  str r7, [r0, #36]
+  str r8, [r0, #44]
+  str r9, [r0, #52]
+  str r10, [r0, #60]
+  ldr r3, [r0, #68]
+  ldr r4, [r0, #76]
+  ldr r5, [r0, #84]
+  ldr r6, [r0, #92]
+  ldr r7, [r0, #100]
+  ldr r8, [r0, #108]
+  ldr r9, [r0, #116]
+  ldr r10, [r0, #124]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
+  str r3, [r0, #68]
+  str r4, [r0, #76]
+  str r5, [r0, #84]
+  str r6, [r0, #92]
+  str r7, [r0, #100]
+  str r8, [r0, #108]
+  str r9, [r0, #116]
+  str r10, [r0, #124]
+  ldr r3, [r0, #132]
+  ldr r4, [r0, #140]
+  ldr r5, [r0, #148]
+  ldr r6, [r0, #156]
+  ldr r7, [r0, #164]
+  ldr r8, [r0, #172]
+  ldr r9, [r0, #180]
+  ldr r10, [r0, #188]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
+  str r3, [r0, #132]
+  str r4, [r0, #140]
+  str r5, [r0, #148]
+  str r6, [r0, #156]
+  str r7, [r0, #164]
+  str r8, [r0, #172]
+  str r9, [r0, #180]
+  str r10, [r0, #188]
+  pop {r4-r12, pc}
 
