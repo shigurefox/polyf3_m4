@@ -263,6 +263,52 @@ def print_polyf3_mul_packed():
 	print('  bne.w unit_mul')
 	print('  pop.w {r4-r12, pc}\n')
 
+def print_polyf3_ror():
+	ldr_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
+	str_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
+	curr_index = 0
+	print('.global polyf3_ror_asm')
+	print('.type polyf3_ror_asm, %function')
+	print('@ void polyf3_ror_asm(uint32_t *tritIn)')
+	print('polyf3_ror_asm:')
+	print('  push {r4-r12, lr}')
+	print('  mov r1, r0')
+	print('  mov r2, r0')
+
+	print('  ldr %s, [r1], #4 // load %d' % (ldr_regs[0], curr_index))
+	print('  ldr %s, [r1], #4' % (ldr_regs[1]))
+	while (curr_index < 22):
+		print('  ldr %s, [r1], #4 // load %d' % (ldr_regs[2], curr_index+1))
+		print('  ldr %s, [r1], #4' % (ldr_regs[3]))
+		print('  lsr %s, %s, #1' % (ldr_regs[0], ldr_regs[0]))
+		print('  lsr %s, %s, #1' % (ldr_regs[1], ldr_regs[1]))
+		print('  orr %s, %s, %s, lsl #31' % (ldr_regs[0], ldr_regs[0], ldr_regs[2]))
+		print('  orr %s, %s, %s, lsl #31' % (ldr_regs[1], ldr_regs[1], ldr_regs[3]))
+		print('  str %s, [r2], #4 // store %d' % (str_regs[0], curr_index))
+		print('  str %s, [r2], #4' % (str_regs[1]))
+		print('  ldr %s, [r1], #4 // load %d' % (ldr_regs[0], curr_index+2))
+		print('  ldr %s, [r1], #4' % (ldr_regs[1]))
+		print('  lsr %s, %s, #1' % (ldr_regs[2], ldr_regs[2]))
+		print('  lsr %s, %s, #1' % (ldr_regs[3], ldr_regs[3]))
+		print('  orr %s, %s, %s, lsl #31' % (ldr_regs[2], ldr_regs[2], ldr_regs[0]))
+		print('  orr %s, %s, %s, lsl #31' % (ldr_regs[3], ldr_regs[3], ldr_regs[1]))
+		print('  str %s, [r2], #4 // store %d' % (str_regs[2], curr_index+1))
+		print('  str %s, [r2], #4' % (str_regs[3]))
+		curr_index += 2
+	print('  ldr %s, [r1], #4 // load 23' % (ldr_regs[2]))
+	print('  ldr %s, [r1], #4' % (ldr_regs[3]))
+	print('  lsr %s, %s, #1' % (ldr_regs[0], ldr_regs[0]))
+	print('  lsr %s, %s, #1' % (ldr_regs[1], ldr_regs[1]))
+	print('  orr %s, %s, %s, lsl #31' % (ldr_regs[0], ldr_regs[0], ldr_regs[2]))
+	print('  orr %s, %s, %s, lsl #31' % (ldr_regs[1], ldr_regs[1], ldr_regs[3]))
+	print('  str %s, [r2], #4 // store 22' % (str_regs[0]))
+	print('  str %s, [r2], #4' % (str_regs[1]))
+	print('  lsr %s, %s, #1' % (ldr_regs[2], ldr_regs[2]))
+	print('  lsr %s, %s, #1' % (ldr_regs[3], ldr_regs[3]))
+	print('  str %s, [r2], #4 // store 23' % (str_regs[2]))
+	print('  str %s, [r2], #4' % (str_regs[3]))
+	print('  pop {r4-r12, pc}\n')
+
 def print_polyf3_ror767():
 	bndry = 2 * (NN // 32)
 	num_loops = (NN // 32)
@@ -374,4 +420,5 @@ print_polyf3_unpack()
 print_polyf3_add_packed()
 print_polyf3_sub_packed()
 print_polyf3_mul_packed()
+print_polyf3_ror()
 print_polyf3_ror767()

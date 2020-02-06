@@ -919,7 +919,7 @@ void polyf3_mul_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *trit
 }
 
 
-void polyf3_mul_scalar_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+void polyf3_mul_scalar_packed_fast(uint32_t *tritOut, uint32_t tritIn1[2], uint32_t *tritIn2) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8;
     uint32_t *readOp1, *readOp2, *writeSum, *bndry;
 
@@ -929,19 +929,17 @@ void polyf3_mul_scalar_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_
     bndry = writeSum + 48;
     r0 = *(readOp1++);
     r1 = *(readOp1++);
-    r2 = __SBFX(r0, 0, 1);
-    r3 = __SBFX(r1, 0, 1);
 
     while (writeSum != bndry) {
-        r4 = *(readOp2++);
-        r5 = *(readOp2++);
+        r2 = *(readOp2++);
+        r3 = *(readOp2++);
 
-        r6 = r2 & r4;
-        r7 = r3 ^ r5;
-        r8 = r6 & r7;
+        r4 = r0 & r2;
+        r6 = r1 ^ r3;
+        r5 = r4 & r6;
 
-        *(writeSum++) = r6;
-        *(writeSum++) = r8;
+        *(writeSum++) = r4;
+        *(writeSum++) = r5;
     }
 }
 
@@ -2088,6 +2086,41 @@ void polyf3_jump32divsteps(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, uint
     }
 }
 
+// assert input size = 768
+void polyf3_ror(uint32_t *tritIn) {
+    /*
+    uint32_t r0, r1, r2, r3;
+    uint32_t *readOp, *writeOp, *bndry;
+    readOp = tritIn;
+    writeOp = tritIn;
+    bndry = tritIn + 46;
+    while (readOp != bndry) {
+        r0 = *(readOp++);
+        r1 = *(readOp++);
+        r2 = *(readOp);
+        r3 = *(readOp+1);
+        r0 >>= 1;
+        r1 >>= 1;
+        r0 = __ORR_LSL(r0, r2, 31);
+        r1 = __ORR_LSL(r1, r3, 31);
+        *(writeOp++) = r0;
+        *(writeOp++) = r1;
+    }
+    */
+    for (int i = 0; i < 46; i += 2) {
+        tritIn[i] = (tritIn[i] >> 1) | (tritIn[i+2] << 31);
+        tritIn[i+1] = (tritIn[i+1] >> 1) | (tritIn[i+3] << 31);
+    }
+    tritIn[46] >>= 1;
+    tritIn[47] >>= 1;
+}
+
+extern void polyf3_ror_asm(uint32_t *);
+
+void polyf3_ror_fast(uint32_t *tritIn) {
+    polyf3_ror_asm(tritIn);
+}
+
 void polyf3_ror767_adcs(uint32_t *tritIn) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7;
     uint32_t *readOp, *writeOp, *bndry;
@@ -2095,7 +2128,7 @@ void polyf3_ror767_adcs(uint32_t *tritIn) {
     writeOp = tritIn;
     bndry = tritIn + 48;
 
-    __asm__ volatile ("adds r4, r4, #0");
+    __asm__ volatile ("adds r4, #0");
 
     while (writeOp != bndry) {
         r0 = *(readOp);
@@ -2146,7 +2179,7 @@ void polyf3_ror767_adcs(uint32_t *tritIn) {
     writeOp = tritIn + 1;
     bndry = tritIn + 49;
 
-    __asm__ volatile ("adds r4, r4, #0");
+    __asm__ volatile ("adds r4, #0");
 
     while (writeOp != bndry) {
         r0 = *(readOp);
@@ -2242,7 +2275,7 @@ void polyf3_ror767_bfi(uint32_t *tritIn) {
     }
 }
 
-extern void polyf3_ror767_asm(uint32_t *tritIn);
+extern void polyf3_ror767_asm(uint32_t *);
 
 void polyf3_ror767_fast(uint32_t *tritIn) {
     polyf3_ror767_asm(tritIn);
@@ -2250,14 +2283,10 @@ void polyf3_ror767_fast(uint32_t *tritIn) {
 
 // assert input size = 768
 void polyf3_jump32divsteps768(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t **uvrs) {
-    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
-    uint32_t *readOp1, *readOp2, *writeOp, *u, *v, *r, *s;
-    readOp1 = tritIn1;
-    readOp2 = tritIn2;
-    r0 = *(readOp1); // a0
-    r1 = *(readOp1+1); // a1
-    r2 = *(readOp2); // b0
-    r3 = *(readOp2+1); // b1
+    uint32_t r0, r1, r2, r3, r4[2], r6;
+    uint32_t *u, *v, *r, *s;
+    uint32_t tritTmp[48] = {0};
+    r2 = *(tritIn2);
     u = uvrs[0];
     v = uvrs[1];
     r = uvrs[2];
@@ -2272,60 +2301,35 @@ void polyf3_jump32divsteps768(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, u
             delta = -delta;
         }
         delta++;
-        writeOp = tritIn2;
-
+        r0 = *(tritIn1);
+        r1 = *(tritIn1+1);
+        r2 = *(tritIn2);
+        r3 = *(tritIn2+1);
         // c = f[0]^(-1) * g[0] = f[0] * g[0] (mod 3)
         // duplicate with sbfx to do 32 scalar mults at a time
-        r4 = r0 & r2;
-        r8 = r1 ^ r3;
-        r5 = r4 & r8;
-        r4 = __SBFX(r4, 0, 1);
-        r5 = __SBFX(r5, 0, 1);
+        r4[0] = r0 & r2;
+        r6 = r1 ^ r3;
+        r4[1] = r4[0] & r6;
+        r4[0] = __SBFX(r4[0], 0, 1);
+        r4[1] = __SBFX(r4[1], 0, 1);
 
         // g = (g - c*f)/x
-        r6 = r4 & r0;
-        r8 = r5 ^ r1;
-        r7 = r6 & r8;
-
-        r8 = r2 ^ r6;
-        r9 = r8 ^ r7;
-        r10 = r3 ^ r6;
-        r2 = r9 & r10;
-        r10 = r3 ^ r7;
-        r3 = r8 | r10;
-
-        // update g
-        *(writeOp++) = r2 >> 1;
-        *(writeOp++) = r3 >> 1;
+        polyf3_mul_scalar_packed_fast(tritTmp, r4, tritIn2);
+        polyf3_sub_packed_fast(tritIn2, tritTmp, tritIn2);
+        polyf3_ror(tritIn2);
 
         // r = (r - c*u)
-        r6 = r4 & *u;
-        r8 = r5 ^ *(u+1);
-        r7 = r6 & r8;
-
-        r8 = *r ^ r6;
-        r9 = r8 ^ r7;
-        r10 = *(r+1) ^ r6;
-        *r = r9 & r10;
-        r10 = *(r+1) ^ r7;
-        *(r+1) = r8 | r10;
+        polyf3_mul_scalar_packed_fast(tritTmp, r4, u);
+        polyf3_sub_packed_fast(r, tritTmp, u);
 
         // s = (s - c*v)
-        r6 = r4 & *v;
-        r8 = r5 ^ *(v+1);
-        r7 = r6 & r8;
+        polyf3_mul_scalar_packed_fast(tritTmp, r4, v);
+        polyf3_sub_packed_fast(s, tritTmp, v);
 
-        r8 = *s ^ r6;
-        r9 = r8 ^ r7;
-        r10 = *(s+1) ^ r6;
-        *s = r9 & r10;
-        r10 = *(s+1) ^ r7;
-        *(s+1) = r8 | r10;
-
-        // TODO: below should be omitted in the last iteration
+        // TODO: ror should be omitted in the last iteration
         if (i > 1) {
-            *u <<= 1;
-            *v <<= 1;
+            polyf3_ror767_fast(u);
+            polyf3_ror767_fast(v);
         }
     }
 }

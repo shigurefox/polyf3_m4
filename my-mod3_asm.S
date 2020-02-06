@@ -1260,6 +1260,205 @@ unit_mul:
   bne.w unit_mul
   pop.w {r4-r12, pc}
 
+.global polyf3_ror_asm
+.type polyf3_ror_asm, %function
+@ void polyf3_ror_asm(uint32_t *tritIn)
+polyf3_ror_asm:
+  push {r4-r12, lr}
+  mov r1, r0
+  mov r2, r0
+  ldr r3, [r1], #4 // load 0
+  ldr r4, [r1], #4
+  ldr r5, [r1], #4 // load 1
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 0
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 2
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 1
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 3
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 2
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 4
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 3
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 5
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 4
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 6
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 5
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 7
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 6
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 8
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 7
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 9
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 8
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 10
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 9
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 11
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 10
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 12
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 11
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 13
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 12
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 14
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 13
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 15
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 14
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 16
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 15
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 17
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 16
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 18
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 17
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 19
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 18
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 20
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 19
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 21
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 20
+  str r4, [r2], #4
+  ldr r3, [r1], #4 // load 22
+  ldr r4, [r1], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  orr r5, r5, r3, lsl #31
+  orr r6, r6, r4, lsl #31
+  str r5, [r2], #4 // store 21
+  str r6, [r2], #4
+  ldr r5, [r1], #4 // load 23
+  ldr r6, [r1], #4
+  lsr r3, r3, #1
+  lsr r4, r4, #1
+  orr r3, r3, r5, lsl #31
+  orr r4, r4, r6, lsl #31
+  str r3, [r2], #4 // store 22
+  str r4, [r2], #4
+  lsr r5, r5, #1
+  lsr r6, r6, #1
+  str r5, [r2], #4 // store 23
+  str r6, [r2], #4
+  pop {r4-r12, pc}
+
 .global polyf3_ror767_asm
 .type polyf3_ror767_asm, %function
 @ void polyf3_ror767_asm(uint32_t *tritIn)
