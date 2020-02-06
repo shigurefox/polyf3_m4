@@ -834,6 +834,19 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMLAWT (uint32_t o
   return(result);
 }
 
+#define __ADCS(ARG1, ARG2) \
+({                          \
+    uint32_t __RES, __ARG1 = (ARG1), __ARG2 = (ARG2); \
+    __ASM ("adcs %0, %1, %2" : "=r" (__RES) : "r" (__ARG1), "r" (__ARG2) : "cc" ); \
+    __RES; \
+})
+
+#define __ADDS(ARG1, ARG2) \
+({                          \
+    uint32_t __RES, __ARG1 = (ARG1), __ARG2 = (ARG2); \
+    __ASM ("adds %0, %1, %2" : "=r" (__RES) : "r" (__ARG1), "r" (__ARG2) : "cc" ); \
+    __RES; \
+})
 
 #define __BFI(RES, ARG1, ARG2, ARG3) \
 ({                          \
@@ -862,6 +875,13 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMLAWT (uint32_t o
   __ASM ("orr %0, %1, %2, ror %3" : "=r" (__RES) :  "r" (__ARG1), "r" (__ARG2), "I" (ARG3) : "cc" ); \
   __RES; \
  })
+
+#define __ORR_LSL(ARG1,ARG2,ARG3) \
+({                          \
+  uint32_t __RES, __ARG1 = (ARG1), __ARG2 = (ARG2); \
+  __ASM ("orr %0, %1, %2, lsl %3" : "=r" (__RES) :  "r" (__ARG1), "r" (__ARG2), "I" (ARG3) : "cc" ); \
+  __RES; \
+})
 
 #define __ORR_LSR(ARG1,ARG2,ARG3) \
 ({                          \
