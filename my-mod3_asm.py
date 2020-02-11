@@ -100,7 +100,7 @@ def print_polyf3_pack():
 	print('  bne.w unit_pack')
 	print('  pop.w {r4-r12, pc}\n')
 
-
+'''
 def print_polyf3_unpack():
 	bndry = 2 * (NN // 32)
 	trit_regs = ['r3', 'r4']
@@ -134,7 +134,41 @@ def print_polyf3_unpack():
 	print('  cmp.w r1, r2')
 	print('  bne.w unit_unpack')
 	print('  pop.w {r4-r12, pc}\n')
+'''
 
+def print_polyf3_unpack():
+	bndry = 2 * (NN // 32)
+	trit_regs = ['r3', 'r4']
+	mod3_regs = ['r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'lr']
+	MAX_MOVE = len(mod3_regs) - 2
+	print('.global polyf3_unpack_asm')
+	print('.type polyf3_unpack_asm, %function')
+	print('@ void polyf3_unpack_asm(uint32_t* mod3Out, uint32_t* tritIn)')
+	print('polyf3_unpack_asm:')
+	print('  push {r4-r12, lr}')
+	print('  add r2, r1, #%d' % (bndry * 4))
+	print('unit_unpack:')
+	print('  ldr %s, [r1], #4' % (trit_regs[0]))
+	print('  ldr %s, [r1], #4' % (trit_regs[1]))
+	for batch in range(0, 16, MAX_MOVE):
+		MOVE = min(MAX_MOVE, 16 - batch)
+		for it in range(MOVE):
+			coef_id = (batch + it) * 2
+			print('  sbfx %s, %s, #%d, #1' % (mod3_regs[it], trit_regs[1], coef_id))
+			print('  and %s, %s, #0x%x' % (mod3_regs[it + 1], trit_regs[0], pow(2, coef_id)))
+			if coef_id:
+				print('  orr %s, %s, %s, lsr #%d' % (mod3_regs[it], mod3_regs[it], mod3_regs[it + 1], coef_id))
+			else:
+				print('  orr %s, %s, %s' % (mod3_regs[it], mod3_regs[it], mod3_regs[it + 1]))
+			print('  sbfx %s, %s, #%d, #1' % (mod3_regs[it + 1], trit_regs[1], coef_id + 1))
+			print('  and %s, %s, #0x%x' % (mod3_regs[it + 2], trit_regs[0], pow(2, coef_id + 1)))
+			print('  orr %s, %s, %s, lsr #%d' % (mod3_regs[it + 1], mod3_regs[it + 1], mod3_regs[it + 2], coef_id + 1))
+			print('  pkhbt %s, %s, %s, lsl #16' % (mod3_regs[it], mod3_regs[it], mod3_regs[it + 1]))
+		for it in range(MOVE):
+			print('  str %s, [r0], #4' % (mod3_regs[it]))
+	print('  cmp r1, r2')
+	print('  bne unit_unpack')
+	print('  pop {r4-r12, pc}\n')
 
 def print_polyf3_add_packed():
 	bndry = 2 * (NN // 32)
@@ -142,6 +176,7 @@ def print_polyf3_add_packed():
 	print('.type polyf3_add_packed_asm, %function')
 	print('@ void polyf3_add_packed_asm(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2)')
 	print('polyf3_add_packed_asm:')
+	print('  push.w {r4-r12, lr}')
 #	print('  add.w r3, r0, #%d' % (bndry * 4))
 #	print('unit_add:')
 	for tmp_count in range(bndry // 4):
@@ -162,7 +197,6 @@ def print_polyf3_add_packed():
 		print('  eor.w r12, r9, r10')
 		print('  eor.w r9, r8, r11')
 		print('  and.w r9, r9, r12')
-		print('  push.w {r4-r12, lr}')
 		print('  eor.w r12, r12, r11')
 		print('  eor.w r8, r8, r10')
 		print('  orr.w r8, r8, r12')
@@ -263,14 +297,14 @@ def print_polyf3_mul_packed():
 	print('  bne.w unit_mul')
 	print('  pop.w {r4-r12, pc}\n')
 
-def print_polyf3_ror():
+def print_polyf3_lsr():
 	ldr_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	str_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	curr_index = 0
-	print('.global polyf3_ror_asm')
-	print('.type polyf3_ror_asm, %function')
-	print('@ void polyf3_ror_asm(uint32_t *tritIn)')
-	print('polyf3_ror_asm:')
+	print('.global polyf3_lsr_asm')
+	print('.type polyf3_lsr_asm, %function')
+	print('@ void polyf3_lsr_asm(uint32_t *tritIn)')
+	print('polyf3_lsr_asm:')
 	print('  push {r4-r12, lr}')
 	print('  mov r1, r0')
 	print('  mov r2, r0')
@@ -309,15 +343,15 @@ def print_polyf3_ror():
 	print('  str %s, [r2], #4' % (str_regs[3]))
 	print('  pop {r4-r12, pc}\n')
 
-def print_polyf3_ror767():
+def print_polyf3_lsl():
 	bndry = 2 * (NN // 32)
 	num_loops = (NN // 32)
 	ldr_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	str_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
-	print('.global polyf3_ror767_asm')
-	print('.type polyf3_ror767_asm, %function')
-	print('@ void polyf3_ror767_asm(uint32_t *tritIn)')
-	print('polyf3_ror767_asm:')
+	print('.global polyf3_lsl_asm')
+	print('.type polyf3_lsl_asm, %function')
+	print('@ void polyf3_lsl_asm(uint32_t *tritIn)')
+	print('polyf3_lsl_asm:')
 	print('  push {r4-r12, lr}')
 	print('  adds r3, #0')
 #	print('  adds.w r12, r0, #%d' % (bndry * 4))
@@ -420,5 +454,5 @@ print_polyf3_unpack()
 print_polyf3_add_packed()
 print_polyf3_sub_packed()
 print_polyf3_mul_packed()
-print_polyf3_ror()
-print_polyf3_ror767()
+print_polyf3_lsr()
+print_polyf3_lsl()
