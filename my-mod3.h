@@ -25,4 +25,11 @@ void polyf3_lsl(uint32_t *);
 void polyf3_lsr_fast(uint32_t *);
 void polyf3_lsl_fast(uint32_t *);
 
+void polyf3_rol32_negc(uint32_t *, int);
+void polyf3_rol64_negc(uint32_t *, int);
 void polyf3_jump32divsteps768(int32_t, uint32_t *, uint32_t *, uint32_t [192]);
+
+void polyf3_butterfly32_CT(uint32_t *, uint32_t *, int k);
+void polyf3_butterfly32_GS(uint32_t *, uint32_t *, int k);
+void polyf3_butterfly64_CT(uint32_t *, uint32_t *, int k);
+void polyf3_butterfly64_GS(uint32_t *, uint32_t *, int k);

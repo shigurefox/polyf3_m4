@@ -89,142 +89,142 @@ unit_pack:
 .type polyf3_unpack_asm, %function
 @ void polyf3_unpack_asm(uint32_t* mod3Out, uint32_t* tritIn)
 polyf3_unpack_asm:
-  push {r4-r12, lr}
-  add r2, r1, #192
+  push.w {r4-r12, lr}
+  add.w r2, r1, #192
 unit_unpack:
-  ldr r3, [r1], #4
-  ldr r4, [r1], #4
-  sbfx r5, r4, #0, #1
-  and r6, r3, #0x1
-  orr r5, r5, r6
-  sbfx r6, r4, #1, #1
-  and r7, r3, #0x2
-  orr r6, r6, r7, lsr #1
-  pkhbt r5, r5, r6, lsl #16
-  sbfx r6, r4, #2, #1
-  and r7, r3, #0x4
-  orr r6, r6, r7, lsr #2
-  sbfx r7, r4, #3, #1
-  and r8, r3, #0x8
-  orr r7, r7, r8, lsr #3
-  pkhbt r6, r6, r7, lsl #16
-  sbfx r7, r4, #4, #1
-  and r8, r3, #0x10
-  orr r7, r7, r8, lsr #4
-  sbfx r8, r4, #5, #1
-  and r9, r3, #0x20
-  orr r8, r8, r9, lsr #5
-  pkhbt r7, r7, r8, lsl #16
-  sbfx r8, r4, #6, #1
-  and r9, r3, #0x40
-  orr r8, r8, r9, lsr #6
-  sbfx r9, r4, #7, #1
-  and r10, r3, #0x80
-  orr r9, r9, r10, lsr #7
-  pkhbt r8, r8, r9, lsl #16
-  sbfx r9, r4, #8, #1
-  and r10, r3, #0x100
-  orr r9, r9, r10, lsr #8
-  sbfx r10, r4, #9, #1
-  and r11, r3, #0x200
-  orr r10, r10, r11, lsr #9
-  pkhbt r9, r9, r10, lsl #16
-  sbfx r10, r4, #10, #1
-  and r11, r3, #0x400
-  orr r10, r10, r11, lsr #10
-  sbfx r11, r4, #11, #1
-  and r12, r3, #0x800
-  orr r11, r11, r12, lsr #11
-  pkhbt r10, r10, r11, lsl #16
-  sbfx r11, r4, #12, #1
-  and r12, r3, #0x1000
-  orr r11, r11, r12, lsr #12
-  sbfx r12, r4, #13, #1
-  and lr, r3, #0x2000
-  orr r12, r12, lr, lsr #13
-  pkhbt r11, r11, r12, lsl #16
-  str r5, [r0], #4
-  str r6, [r0], #4
-  str r7, [r0], #4
-  str r8, [r0], #4
-  str r9, [r0], #4
-  str r10, [r0], #4
-  str r11, [r0], #4
-  sbfx r5, r4, #14, #1
-  and r6, r3, #0x4000
-  orr r5, r5, r6, lsr #14
-  sbfx r6, r4, #15, #1
-  and r7, r3, #0x8000
-  orr r6, r6, r7, lsr #15
-  pkhbt r5, r5, r6, lsl #16
-  sbfx r6, r4, #16, #1
-  and r7, r3, #0x10000
-  orr r6, r6, r7, lsr #16
-  sbfx r7, r4, #17, #1
-  and r8, r3, #0x20000
-  orr r7, r7, r8, lsr #17
-  pkhbt r6, r6, r7, lsl #16
-  sbfx r7, r4, #18, #1
-  and r8, r3, #0x40000
-  orr r7, r7, r8, lsr #18
-  sbfx r8, r4, #19, #1
-  and r9, r3, #0x80000
-  orr r8, r8, r9, lsr #19
-  pkhbt r7, r7, r8, lsl #16
-  sbfx r8, r4, #20, #1
-  and r9, r3, #0x100000
-  orr r8, r8, r9, lsr #20
-  sbfx r9, r4, #21, #1
-  and r10, r3, #0x200000
-  orr r9, r9, r10, lsr #21
-  pkhbt r8, r8, r9, lsl #16
-  sbfx r9, r4, #22, #1
-  and r10, r3, #0x400000
-  orr r9, r9, r10, lsr #22
-  sbfx r10, r4, #23, #1
-  and r11, r3, #0x800000
-  orr r10, r10, r11, lsr #23
-  pkhbt r9, r9, r10, lsl #16
-  sbfx r10, r4, #24, #1
-  and r11, r3, #0x1000000
-  orr r10, r10, r11, lsr #24
-  sbfx r11, r4, #25, #1
-  and r12, r3, #0x2000000
-  orr r11, r11, r12, lsr #25
-  pkhbt r10, r10, r11, lsl #16
-  sbfx r11, r4, #26, #1
-  and r12, r3, #0x4000000
-  orr r11, r11, r12, lsr #26
-  sbfx r12, r4, #27, #1
-  and lr, r3, #0x8000000
-  orr r12, r12, lr, lsr #27
-  pkhbt r11, r11, r12, lsl #16
-  str r5, [r0], #4
-  str r6, [r0], #4
-  str r7, [r0], #4
-  str r8, [r0], #4
-  str r9, [r0], #4
-  str r10, [r0], #4
-  str r11, [r0], #4
-  sbfx r5, r4, #28, #1
-  and r6, r3, #0x10000000
-  orr r5, r5, r6, lsr #28
-  sbfx r6, r4, #29, #1
-  and r7, r3, #0x20000000
-  orr r6, r6, r7, lsr #29
-  pkhbt r5, r5, r6, lsl #16
-  sbfx r6, r4, #30, #1
-  and r7, r3, #0x40000000
-  orr r6, r6, r7, lsr #30
-  sbfx r7, r4, #31, #1
-  and r8, r3, #0x80000000
-  orr r7, r7, r8, lsr #31
-  pkhbt r6, r6, r7, lsl #16
-  str r5, [r0], #4
-  str r6, [r0], #4
-  cmp r1, r2
-  bne unit_unpack
-  pop {r4-r12, pc}
+  ldr.w r3, [r1], #4
+  ldr.w r4, [r1], #4
+  sbfx.w r5, r4, #0, #1
+  and.w r6, r3, #0x1
+  orr.w r5, r5, r6
+  sbfx.w r6, r4, #1, #1
+  and.w r7, r3, #0x2
+  orr.w r6, r6, r7, lsr #1
+  pkhbt.w r5, r5, r6, lsl #16
+  sbfx.w r6, r4, #2, #1
+  and.w r7, r3, #0x4
+  orr.w r6, r6, r7, lsr #2
+  sbfx.w r7, r4, #3, #1
+  and.w r8, r3, #0x8
+  orr.w r7, r7, r8, lsr #3
+  pkhbt.w r6, r6, r7, lsl #16
+  sbfx.w r7, r4, #4, #1
+  and.w r8, r3, #0x10
+  orr.w r7, r7, r8, lsr #4
+  sbfx.w r8, r4, #5, #1
+  and.w r9, r3, #0x20
+  orr.w r8, r8, r9, lsr #5
+  pkhbt.w r7, r7, r8, lsl #16
+  sbfx.w r8, r4, #6, #1
+  and.w r9, r3, #0x40
+  orr.w r8, r8, r9, lsr #6
+  sbfx.w r9, r4, #7, #1
+  and.w r10, r3, #0x80
+  orr.w r9, r9, r10, lsr #7
+  pkhbt.w r8, r8, r9, lsl #16
+  sbfx.w r9, r4, #8, #1
+  and.w r10, r3, #0x100
+  orr.w r9, r9, r10, lsr #8
+  sbfx.w r10, r4, #9, #1
+  and.w r11, r3, #0x200
+  orr.w r10, r10, r11, lsr #9
+  pkhbt.w r9, r9, r10, lsl #16
+  sbfx.w r10, r4, #10, #1
+  and.w r11, r3, #0x400
+  orr.w r10, r10, r11, lsr #10
+  sbfx.w r11, r4, #11, #1
+  and.w r12, r3, #0x800
+  orr.w r11, r11, r12, lsr #11
+  pkhbt.w r10, r10, r11, lsl #16
+  sbfx.w r11, r4, #12, #1
+  and.w r12, r3, #0x1000
+  orr.w r11, r11, r12, lsr #12
+  sbfx.w r12, r4, #13, #1
+  and.w lr, r3, #0x2000
+  orr.w r12, r12, lr, lsr #13
+  pkhbt.w r11, r11, r12, lsl #16
+  str.w r5, [r0], #4
+  str.w r6, [r0], #4
+  str.w r7, [r0], #4
+  str.w r8, [r0], #4
+  str.w r9, [r0], #4
+  str.w r10, [r0], #4
+  str.w r11, [r0], #4
+  sbfx.w r5, r4, #14, #1
+  and.w r6, r3, #0x4000
+  orr.w r5, r5, r6, lsr #14
+  sbfx.w r6, r4, #15, #1
+  and.w r7, r3, #0x8000
+  orr.w r6, r6, r7, lsr #15
+  pkhbt.w r5, r5, r6, lsl #16
+  sbfx.w r6, r4, #16, #1
+  and.w r7, r3, #0x10000
+  orr.w r6, r6, r7, lsr #16
+  sbfx.w r7, r4, #17, #1
+  and.w r8, r3, #0x20000
+  orr.w r7, r7, r8, lsr #17
+  pkhbt.w r6, r6, r7, lsl #16
+  sbfx.w r7, r4, #18, #1
+  and.w r8, r3, #0x40000
+  orr.w r7, r7, r8, lsr #18
+  sbfx.w r8, r4, #19, #1
+  and.w r9, r3, #0x80000
+  orr.w r8, r8, r9, lsr #19
+  pkhbt.w r7, r7, r8, lsl #16
+  sbfx.w r8, r4, #20, #1
+  and.w r9, r3, #0x100000
+  orr.w r8, r8, r9, lsr #20
+  sbfx.w r9, r4, #21, #1
+  and.w r10, r3, #0x200000
+  orr.w r9, r9, r10, lsr #21
+  pkhbt.w r8, r8, r9, lsl #16
+  sbfx.w r9, r4, #22, #1
+  and.w r10, r3, #0x400000
+  orr.w r9, r9, r10, lsr #22
+  sbfx.w r10, r4, #23, #1
+  and.w r11, r3, #0x800000
+  orr.w r10, r10, r11, lsr #23
+  pkhbt.w r9, r9, r10, lsl #16
+  sbfx.w r10, r4, #24, #1
+  and.w r11, r3, #0x1000000
+  orr.w r10, r10, r11, lsr #24
+  sbfx.w r11, r4, #25, #1
+  and.w r12, r3, #0x2000000
+  orr.w r11, r11, r12, lsr #25
+  pkhbt.w r10, r10, r11, lsl #16
+  sbfx.w r11, r4, #26, #1
+  and.w r12, r3, #0x4000000
+  orr.w r11, r11, r12, lsr #26
+  sbfx.w r12, r4, #27, #1
+  and.w lr, r3, #0x8000000
+  orr.w r12, r12, lr, lsr #27
+  pkhbt.w r11, r11, r12, lsl #16
+  str.w r5, [r0], #4
+  str.w r6, [r0], #4
+  str.w r7, [r0], #4
+  str.w r8, [r0], #4
+  str.w r9, [r0], #4
+  str.w r10, [r0], #4
+  str.w r11, [r0], #4
+  sbfx.w r5, r4, #28, #1
+  and.w r6, r3, #0x10000000
+  orr.w r5, r5, r6, lsr #28
+  sbfx.w r6, r4, #29, #1
+  and.w r7, r3, #0x20000000
+  orr.w r6, r6, r7, lsr #29
+  pkhbt.w r5, r5, r6, lsl #16
+  sbfx.w r6, r4, #30, #1
+  and.w r7, r3, #0x40000000
+  orr.w r6, r6, r7, lsr #30
+  sbfx.w r7, r4, #31, #1
+  and.w r8, r3, #0x80000000
+  orr.w r7, r7, r8, lsr #31
+  pkhbt.w r6, r6, r7, lsl #16
+  str.w r5, [r0], #4
+  str.w r6, [r0], #4
+  cmp.w r1, r2
+  bne.w unit_unpack
+  pop.w {r4-r12, pc}
 
 .global polyf3_add_packed_asm
 .type polyf3_add_packed_asm, %function
@@ -1452,152 +1452,154 @@ polyf3_lsr_asm:
 .type polyf3_lsl_asm, %function
 @ void polyf3_lsl_asm(uint32_t *tritIn)
 polyf3_lsl_asm:
-  push {r4-r12, lr}
+  push {r4-r10, lr}
   adds r3, #0
   ldr r3, [r0, #0]
   ldr r4, [r0, #8]
   ldr r5, [r0, #16]
   ldr r6, [r0, #24]
-  ldr r7, [r0, #32]
-  ldr r8, [r0, #40]
-  ldr r9, [r0, #48]
-  ldr r10, [r0, #56]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
-  adcs r7, r7
-  adcs r8, r8
-  adcs r9, r9
-  adcs r10, r10
   str r3, [r0, #0]
   str r4, [r0, #8]
   str r5, [r0, #16]
   str r6, [r0, #24]
-  str r7, [r0, #32]
-  str r8, [r0, #40]
-  str r9, [r0, #48]
-  str r10, [r0, #56]
+  ldr r3, [r0, #32]
+  ldr r4, [r0, #40]
+  ldr r5, [r0, #48]
+  ldr r6, [r0, #56]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  str r3, [r0, #32]
+  str r4, [r0, #40]
+  str r5, [r0, #48]
+  str r6, [r0, #56]
   ldr r3, [r0, #64]
   ldr r4, [r0, #72]
   ldr r5, [r0, #80]
   ldr r6, [r0, #88]
-  ldr r7, [r0, #96]
-  ldr r8, [r0, #104]
-  ldr r9, [r0, #112]
-  ldr r10, [r0, #120]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
-  adcs r7, r7
-  adcs r8, r8
-  adcs r9, r9
-  adcs r10, r10
   str r3, [r0, #64]
   str r4, [r0, #72]
   str r5, [r0, #80]
   str r6, [r0, #88]
-  str r7, [r0, #96]
-  str r8, [r0, #104]
-  str r9, [r0, #112]
-  str r10, [r0, #120]
-  ldr r3, [r0, #128]
-  ldr r4, [r0, #136]
-  ldr r5, [r0, #144]
-  ldr r6, [r0, #152]
-  ldr r7, [r0, #160]
-  ldr r8, [r0, #168]
-  ldr r9, [r0, #176]
-  ldr r10, [r0, #184]
+  ldr r3, [r0, #96]
+  ldr r4, [r0, #104]
+  ldr r5, [r0, #112]
+  ldr r6, [r0, #120]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
-  adcs r7, r7
-  adcs r8, r8
-  adcs r9, r9
-  adcs r10, r10
+  str r3, [r0, #96]
+  str r4, [r0, #104]
+  str r5, [r0, #112]
+  str r6, [r0, #120]
+  ldr r3, [r0, #128]
+  ldr r4, [r0, #136]
+  ldr r5, [r0, #144]
+  ldr r6, [r0, #152]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
   str r3, [r0, #128]
   str r4, [r0, #136]
   str r5, [r0, #144]
   str r6, [r0, #152]
-  str r7, [r0, #160]
-  str r8, [r0, #168]
-  str r9, [r0, #176]
-  str r10, [r0, #184]
+  ldr r3, [r0, #160]
+  ldr r4, [r0, #168]
+  ldr r5, [r0, #176]
+  ldr r6, [r0, #184]
+  adcs r3, r3
+  adcs r4, r4
+  adcs r5, r5
+  adcs r6, r6
+  str r3, [r0, #160]
+  str r4, [r0, #168]
+  str r5, [r0, #176]
+  str r6, [r0, #184]
   adds r3, #0
   ldr r3, [r0, #4]
   ldr r4, [r0, #12]
   ldr r5, [r0, #20]
   ldr r6, [r0, #28]
-  ldr r7, [r0, #36]
-  ldr r8, [r0, #44]
-  ldr r9, [r0, #52]
-  ldr r10, [r0, #60]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
-  adcs r7, r7
-  adcs r8, r8
-  adcs r9, r9
-  adcs r10, r10
   str r3, [r0, #4]
   str r4, [r0, #12]
   str r5, [r0, #20]
   str r6, [r0, #28]
-  str r7, [r0, #36]
-  str r8, [r0, #44]
-  str r9, [r0, #52]
-  str r10, [r0, #60]
   ldr r3, [r0, #68]
   ldr r4, [r0, #76]
   ldr r5, [r0, #84]
   ldr r6, [r0, #92]
-  ldr r7, [r0, #100]
-  ldr r8, [r0, #108]
-  ldr r9, [r0, #116]
-  ldr r10, [r0, #124]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
-  adcs r7, r7
-  adcs r8, r8
-  adcs r9, r9
-  adcs r10, r10
   str r3, [r0, #68]
   str r4, [r0, #76]
   str r5, [r0, #84]
   str r6, [r0, #92]
-  str r7, [r0, #100]
-  str r8, [r0, #108]
-  str r9, [r0, #116]
-  str r10, [r0, #124]
   ldr r3, [r0, #132]
   ldr r4, [r0, #140]
   ldr r5, [r0, #148]
   ldr r6, [r0, #156]
-  ldr r7, [r0, #164]
-  ldr r8, [r0, #172]
-  ldr r9, [r0, #180]
-  ldr r10, [r0, #188]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
-  adcs r7, r7
-  adcs r8, r8
-  adcs r9, r9
-  adcs r10, r10
   str r3, [r0, #132]
   str r4, [r0, #140]
   str r5, [r0, #148]
   str r6, [r0, #156]
-  str r7, [r0, #164]
-  str r8, [r0, #172]
-  str r9, [r0, #180]
-  str r10, [r0, #188]
-  pop {r4-r12, pc}
+  pop {r4-r10, pc}
 
+.global polyf3_rol1_32_asm
+.type polyf3_rol1_32_asm, %function
+@ void polyf3_rol1_32_asm(uint32_t *tritIn)
+polyf3_ror1_32_asm:
+  push.w {lr}
+  mov.w r1, r0
+  ldr.w r2, [r0], #4
+  ldr.w r3, [r0], #4
+  ror.w r2, r2, #31
+  eor.w r3, r3, r2, LSL #31
+  ror.w r3, r3, #31
+  str.w r2, [r1], #4
+  str.w r3, [r1], #4
+  pop.w {pc}
+.global polyf3_rol1_64_asm
+.type polyf3_rol1_64_asm, %function
+@ void polyf3_rol1_64_asm(uint32_t *tritIn)
+polyf3_ror1_64_asm:
+  push.w {r4-r12, lr}
+  mov.w r1, r0
+  ldr.w r2, [r0], #4
+  ldr.w r3, [r0], #4
+  ldr.w r4, [r0], #4
+  ldr.w r5, [r0], #4
+  lsl.w r10, r2, #1
+  orr.w r6, r10, r4, LSR #31
+  lsl.w r12, r4, #1
+  orr.w r8, r12, r2, LSR #31
+  eor.w r3, r3, r8, LSL #31
+  lsl.w r11, r3, #1
+  orr.w r7, r11, r5, LSR #31
+  lsl.w lr, r5, #1
+  orr.w r9, lr, r3, LSR #31
+  str.w r6, [r1], #4
+  str.w r7, [r1], #4
+  str.w r8, [r1], #4
+  str.w r9, [r1], #4
+  pop.w {r4-r12, pc}

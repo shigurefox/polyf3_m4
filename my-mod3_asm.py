@@ -5,9 +5,11 @@ import re
 
 try: NN = int(sys.argv[1])
 except: NN = 768
-assert(NN > 0)
-assert(NN % 64 == 0)
+assert((NN > 0) and (NN % 64 == 0))
 
+try: KK = int(sys.argv[2])
+except: KK = 1
+assert((KK > 0) and (KK < 32))
 
 def print_prologue():
 	print('.p2align 2,,3')
@@ -100,7 +102,6 @@ def print_polyf3_pack():
 	print('  bne.w unit_pack')
 	print('  pop.w {r4-r12, pc}\n')
 
-'''
 def print_polyf3_unpack():
 	bndry = 2 * (NN // 32)
 	trit_regs = ['r3', 'r4']
@@ -134,41 +135,7 @@ def print_polyf3_unpack():
 	print('  cmp.w r1, r2')
 	print('  bne.w unit_unpack')
 	print('  pop.w {r4-r12, pc}\n')
-'''
 
-def print_polyf3_unpack():
-	bndry = 2 * (NN // 32)
-	trit_regs = ['r3', 'r4']
-	mod3_regs = ['r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'lr']
-	MAX_MOVE = len(mod3_regs) - 2
-	print('.global polyf3_unpack_asm')
-	print('.type polyf3_unpack_asm, %function')
-	print('@ void polyf3_unpack_asm(uint32_t* mod3Out, uint32_t* tritIn)')
-	print('polyf3_unpack_asm:')
-	print('  push {r4-r12, lr}')
-	print('  add r2, r1, #%d' % (bndry * 4))
-	print('unit_unpack:')
-	print('  ldr %s, [r1], #4' % (trit_regs[0]))
-	print('  ldr %s, [r1], #4' % (trit_regs[1]))
-	for batch in range(0, 16, MAX_MOVE):
-		MOVE = min(MAX_MOVE, 16 - batch)
-		for it in range(MOVE):
-			coef_id = (batch + it) * 2
-			print('  sbfx %s, %s, #%d, #1' % (mod3_regs[it], trit_regs[1], coef_id))
-			print('  and %s, %s, #0x%x' % (mod3_regs[it + 1], trit_regs[0], pow(2, coef_id)))
-			if coef_id:
-				print('  orr %s, %s, %s, lsr #%d' % (mod3_regs[it], mod3_regs[it], mod3_regs[it + 1], coef_id))
-			else:
-				print('  orr %s, %s, %s' % (mod3_regs[it], mod3_regs[it], mod3_regs[it + 1]))
-			print('  sbfx %s, %s, #%d, #1' % (mod3_regs[it + 1], trit_regs[1], coef_id + 1))
-			print('  and %s, %s, #0x%x' % (mod3_regs[it + 2], trit_regs[0], pow(2, coef_id + 1)))
-			print('  orr %s, %s, %s, lsr #%d' % (mod3_regs[it + 1], mod3_regs[it + 1], mod3_regs[it + 2], coef_id + 1))
-			print('  pkhbt %s, %s, %s, lsl #16' % (mod3_regs[it], mod3_regs[it], mod3_regs[it + 1]))
-		for it in range(MOVE):
-			print('  str %s, [r0], #4' % (mod3_regs[it]))
-	print('  cmp r1, r2')
-	print('  bne unit_unpack')
-	print('  pop {r4-r12, pc}\n')
 
 def print_polyf3_add_packed():
 	bndry = 2 * (NN // 32)
@@ -298,6 +265,7 @@ def print_polyf3_mul_packed():
 	print('  pop.w {r4-r12, pc}\n')
 
 def print_polyf3_lsr():
+	count = NN // 32
 	ldr_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	str_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	curr_index = 0
@@ -311,7 +279,7 @@ def print_polyf3_lsr():
 
 	print('  ldr %s, [r1], #4 // load %d' % (ldr_regs[0], curr_index))
 	print('  ldr %s, [r1], #4' % (ldr_regs[1]))
-	while (curr_index < 22):
+	while (curr_index < count - 2):
 		print('  ldr %s, [r1], #4 // load %d' % (ldr_regs[2], curr_index+1))
 		print('  ldr %s, [r1], #4' % (ldr_regs[3]))
 		print('  lsr %s, %s, #1' % (ldr_regs[0], ldr_regs[0]))
@@ -344,109 +312,98 @@ def print_polyf3_lsr():
 	print('  pop {r4-r12, pc}\n')
 
 def print_polyf3_lsl():
-	bndry = 2 * (NN // 32)
-	num_loops = (NN // 32)
+	count = (NN // 32)
 	ldr_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	str_regs = ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10']
 	print('.global polyf3_lsl_asm')
 	print('.type polyf3_lsl_asm, %function')
 	print('@ void polyf3_lsl_asm(uint32_t *tritIn)')
 	print('polyf3_lsl_asm:')
-	print('  push {r4-r12, lr}')
+	print('  push {r4-r10, lr}')
 	print('  adds r3, #0')
-#	print('  adds.w r12, r0, #%d' % (bndry * 4))
-#	print('  mov.w r1, r0')
-#	print('  vmov s0, r0')
 
-	for it in range(0, num_loops, 8):
+	for it in range(0, count, 4):
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[0], 8 * it))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[1], 8 * it + 8))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[2], 8 * it + 16))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[3], 8 * it + 24))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[4], 8 * it + 32))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[5], 8 * it + 40))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[6], 8 * it + 48))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[7], 8 * it + 56))
 		print('  adcs %s, %s' % (str_regs[0], ldr_regs[0]))
 		print('  adcs %s, %s' % (str_regs[1], ldr_regs[1]))
 		print('  adcs %s, %s' % (str_regs[2], ldr_regs[2]))
 		print('  adcs %s, %s' % (str_regs[3], ldr_regs[3]))
-		print('  adcs %s, %s' % (str_regs[4], ldr_regs[4]))
-		print('  adcs %s, %s' % (str_regs[5], ldr_regs[5]))
-		print('  adcs %s, %s' % (str_regs[6], ldr_regs[6]))
-		print('  adcs %s, %s' % (str_regs[7], ldr_regs[7]))
 		print('  str %s, [r0, #%d]' % (str_regs[0], 8 * it))
 		print('  str %s, [r0, #%d]' % (str_regs[1], 8 * it + 8))
 		print('  str %s, [r0, #%d]' % (str_regs[2], 8 * it + 16))
 		print('  str %s, [r0, #%d]' % (str_regs[3], 8 * it + 24))
-		print('  str %s, [r0, #%d]' % (str_regs[4], 8 * it + 32))
-		print('  str %s, [r0, #%d]' % (str_regs[5], 8 * it + 40))
-		print('  str %s, [r0, #%d]' % (str_regs[6], 8 * it + 48))
-		print('  str %s, [r0, #%d]' % (str_regs[7], 8 * it + 56))
 
 	print('  adds r3, #0')
-	for it in range(0, num_loops, 8):
+	for it in range(0, count, 8):
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[0], 8 * it + 4))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[1], 8 * it + 12))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[2], 8 * it + 20))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[3], 8 * it + 28))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[4], 8 * it + 36))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[5], 8 * it + 44))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[6], 8 * it + 52))
-		print('  ldr %s, [r0, #%d]' % (ldr_regs[7], 8 * it + 60))
 		print('  adcs %s, %s' % (str_regs[0], ldr_regs[0]))
 		print('  adcs %s, %s' % (str_regs[1], ldr_regs[1]))
 		print('  adcs %s, %s' % (str_regs[2], ldr_regs[2]))
 		print('  adcs %s, %s' % (str_regs[3], ldr_regs[3]))
-		print('  adcs %s, %s' % (str_regs[4], ldr_regs[4]))
-		print('  adcs %s, %s' % (str_regs[5], ldr_regs[5]))
-		print('  adcs %s, %s' % (str_regs[6], ldr_regs[6]))
-		print('  adcs %s, %s' % (str_regs[7], ldr_regs[7]))
 		print('  str %s, [r0, #%d]' % (str_regs[0], 8 * it + 4))
 		print('  str %s, [r0, #%d]' % (str_regs[1], 8 * it + 12))
 		print('  str %s, [r0, #%d]' % (str_regs[2], 8 * it + 20))
 		print('  str %s, [r0, #%d]' % (str_regs[3], 8 * it + 28))
-		print('  str %s, [r0, #%d]' % (str_regs[4], 8 * it + 36))
-		print('  str %s, [r0, #%d]' % (str_regs[5], 8 * it + 44))
-		print('  str %s, [r0, #%d]' % (str_regs[6], 8 * it + 52))
-		print('  str %s, [r0, #%d]' % (str_regs[7], 8 * it + 60))
 
+	print('  pop {r4-r10, pc}\n')
 
-#	print('unit_rorlow:')
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[0]))
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[1]))
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[2]))
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[3]))
-#	print('  adcs.w %s, %s' % (str_regs[0], ldr_regs[0]))
-#	print('  adcs.w %s, %s' % (str_regs[1], ldr_regs[1]))
-#	print('  adcs.w %s, %s' % (str_regs[2], ldr_regs[2]))
-#	print('  adcs.w %s, %s' % (str_regs[3], ldr_regs[3]))
-#	print('  str.w %s, [r0], #8' % (str_regs[0]))
-#	print('  str.w %s, [r0], #8' % (str_regs[1]))
-#	print('  str.w %s, [r0], #8' % (str_regs[2]))
-#	print('  str.w %s, [r0], #8' % (str_regs[3]))
-#	print('  cmp.w r0, r1')
-#	print('  bne.w unit_rorlow')
+def print_polyf3_rol32():
+	assert((KK > 0) and (KK < 32))
+	ldr_regs = ['r2', 'r3']
+	str_regs = ['r2', 'r3']
+	print('.global polyf3_rol%d_32_asm' % (KK))
+	print('.type polyf3_rol%d_32_asm, %%function' % (KK))
+	print('@ void polyf3_rol%d_32_asm(uint32_t *tritIn)' % (KK))
+	print('polyf3_rol%d_32_asm:' % (KK))
+	print('  push.w {lr}')
+	print('  mov.w r1, r0')
+	print('  ldr.w %s, [r0], #4' % (ldr_regs[0]))
+	print('  ldr.w %s, [r0], #4' % (ldr_regs[1]))
+	print('  ror.w %s, %s, #%d' % (str_regs[0], ldr_regs[0], 32-KK))
+	print('  eor.w %s, %s, %s, LSL #%d' %(str_regs[1], ldr_regs[1], ldr_regs[0], 32-KK))
+	print('  ror.w %s, %s, #%d' % (str_regs[1], ldr_regs[1], 32-KK))
+	print('  str.w %s, [r1], #4' % (str_regs[0]))
+	print('  str.w %s, [r1], #4' % (str_regs[1]))
+	print('  pop.w {pc}')
 
-#	print('  vmov r0, s0')
-#	print('  adds.w r0, #4')
-#	print('unit_rorhigh:')
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[0]))
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[1]))
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[2]))
-#	print('  ldr.w %s, [r0], #8' % (ldr_regs[3]))
-#	print('  adcs.w %s, %s' % (str_regs[0], ldr_regs[0]))
-#	print('  adcs.w %s, %s' % (str_regs[1], ldr_regs[1]))
-#	print('  adcs.w %s, %s' % (str_regs[2], ldr_regs[2]))
-#	print('  adcs.w %s, %s' % (str_regs[3], ldr_regs[3]))
-#	print('  str.w %s, [r0], #8' % (str_regs[0]))
-#	print('  str.w %s, [r0], #8' % (str_regs[1]))
-#	print('  str.w %s, [r0], #8' % (str_regs[2]))
-#	print('  str.w %s, [r0], #8' % (str_regs[3]))
-#	print('  cmp.w r0, r2')
-#	print('  bne.w unit_rorhigh')
-
-	print('  pop {r4-r12, pc}\n')
+def print_polyf3_rol64():
+	assert((KK > 0) and (KK < 32))
+	ldr_regs = ['r2', 'r3', 'r4', 'r5']
+	str_regs = ['r6', 'r7', 'r8', 'r9']
+	tmp_regs = ['r10', 'r11', 'r12', 'lr']
+	print('.global polyf3_rol%d_64_asm' % (KK))
+	print('.type polyf3_rol%d_64_asm, %%function' % (KK))
+	print('@ void polyf3_rol%d_64_asm(uint32_t *tritIn)' % (KK))
+	print('polyf3_rol%d_64_asm:' % (KK))
+	print('  push.w {r4-r12, lr}')
+	print('  mov.w r1, r0')
+	print('  ldr.w %s, [r0], #4' % (ldr_regs[0]))
+	print('  ldr.w %s, [r0], #4' % (ldr_regs[1]))
+	print('  ldr.w %s, [r0], #4' % (ldr_regs[2]))
+	print('  ldr.w %s, [r0], #4' % (ldr_regs[3]))
+	#rotate low bits
+	print('  lsl.w %s, %s, #%d' % (tmp_regs[0], ldr_regs[0], KK))
+	print('  orr.w %s, %s, %s, LSR #%d' % (str_regs[0], tmp_regs[0], ldr_regs[2], 32-KK))
+	print('  lsl.w %s, %s, #%d' % (tmp_regs[2], ldr_regs[2], KK))
+	print('  orr.w %s, %s, %s, LSR #%d' % (str_regs[2], tmp_regs[2], ldr_regs[0], 32-KK))
+	#xor overflow bits
+	print('  eor.w %s, %s, %s, LSL #%d' % (ldr_regs[1], ldr_regs[1], str_regs[2], 32-KK))
+	#rotate high bits
+	print('  lsl.w %s, %s, #%d' % (tmp_regs[1], ldr_regs[1], KK))
+	print('  orr.w %s, %s, %s, LSR #%d' % (str_regs[1], tmp_regs[1], ldr_regs[3], 32-KK))
+	print('  lsl.w %s, %s, #%d' % (tmp_regs[3], ldr_regs[3], KK))
+	print('  orr.w %s, %s, %s, LSR #%d' % (str_regs[3], tmp_regs[3], ldr_regs[1], 32-KK))
+	print('  str.w %s, [r1], #4' % (str_regs[0]))
+	print('  str.w %s, [r1], #4' % (str_regs[1]))
+	print('  str.w %s, [r1], #4' % (str_regs[2]))
+	print('  str.w %s, [r1], #4' % (str_regs[3]))
+	print('  pop.w {r4-r12, pc}')
 
 print_prologue()
 print_polyf3_pack()
@@ -456,3 +413,5 @@ print_polyf3_sub_packed()
 print_polyf3_mul_packed()
 print_polyf3_lsr()
 print_polyf3_lsl()
+print_polyf3_rol32()
+print_polyf3_rol64()

@@ -1,6 +1,32 @@
 #include "my-mod3.h"
 #include "cmsis.h"
 
+extern void polyf3_pack_asm(uint32_t *, uint32_t *);
+extern void polyf3_unpack_asm(uint32_t *, uint32_t *);
+extern void polyf3_add_packed_asm(uint32_t *, uint32_t *, uint32_t *);
+extern void polyf3_sub_packed_asm(uint32_t *, uint32_t *, uint32_t *);
+extern void polyf3_mul_packed_asm(uint32_t *, uint32_t *, uint32_t *);
+
+void polyf3_pack_fast(uint32_t *tritOut, uint32_t *mod3In) {
+    polyf3_pack_asm(tritOut, mod3In);
+}
+
+void polyf3_unpack_fast(uint32_t *mod3Out, uint32_t *tritIn) {
+    polyf3_unpack_asm(mod3Out, tritIn);
+}
+
+void polyf3_add_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    polyf3_add_packed_asm(tritOut, tritIn1, tritIn2);
+}
+
+void polyf3_sub_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    polyf3_sub_packed_asm(tritOut, tritIn1, tritIn2);
+}
+
+void polyf3_mul_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    polyf3_mul_packed_asm(tritOut, tritIn1, tritIn2);
+}
+
 // assert input size = 768
 // TODO: the possibility to exploit "signs"
 // TODO: the possibility to exploit BFI
@@ -339,32 +365,6 @@ void polyf3_unpack(uint32_t *mod3Out, uint32_t *tritIn) {
     *(writeMod3++) = r4;
     *(writeMod3++) = r5;
   }
-}
-
-extern void polyf3_pack_asm(uint32_t *, uint32_t *);
-extern void polyf3_unpack_asm(uint32_t *, uint32_t *);
-extern void polyf3_add_packed_asm(uint32_t *, uint32_t *, uint32_t *);
-extern void polyf3_sub_packed_asm(uint32_t *, uint32_t *, uint32_t *);
-extern void polyf3_mul_packed_asm(uint32_t *, uint32_t *, uint32_t *);
-
-void polyf3_pack_fast(uint32_t *tritOut, uint32_t *mod3In) {
-    polyf3_pack_asm(tritOut, mod3In);
-}
-
-void polyf3_unpack_fast(uint32_t *mod3Out, uint32_t *tritIn) {
-    polyf3_unpack_asm(mod3Out, tritIn);
-}
-
-void polyf3_add_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
-    polyf3_add_packed_asm(tritOut, tritIn1, tritIn2);
-}
-
-void polyf3_sub_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
-    polyf3_sub_packed_asm(tritOut, tritIn1, tritIn2);
-}
-
-void polyf3_mul_packed_fast(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
-    polyf3_mul_packed_asm(tritOut, tritIn1, tritIn2);
 }
 
 // assert input size = 768
@@ -969,1014 +969,6 @@ void polyf3_mul_scalar_packed_fast(uint32_t *tritOut, uint32_t tritIn1[2], uint3
     }
 }
 
-void hybrid_mult_32x32(int32_t *cf, uint32_t *c_from1, uint32_t *f_from1) {
-  uint32_t r0, r1, r2, r3;
-  int32_t ir0, ir1, ir2, ir3, ir4, ir5, ir6;
-
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    ir0 = __SMULBB(r0, r2);
-    ir2 = __SMULBB(r0, r3);
-    ir1 = __SMUADX(r0, r2);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r0 = *(c_from1 - 2);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r3 = *(f_from1 + 1);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r2 = *(f_from1 - 1);
-    r3 = *(f_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r0 = *(c_from1 - 2);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r3 = *(f_from1 + 1);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r2 = *(f_from1 - 1);
-    r3 = *(f_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r0 = *(c_from1 - 2);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r3 = *(f_from1 + 1);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r2 = *(f_from1 - 1);
-    r3 = *(f_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r3 = *(f_from1 + 1);
-    r2 = *(f_from1--);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    r2 = *(f_from1 - 1);
-    r3 = *(f_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1 + 1);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r3 = *(f_from1 + 1);
-    r2 = *(f_from1--);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    r2 = *(f_from1 - 1);
-    r3 = *(f_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1 + 1);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r1 = *(c_from1--);
-    r0 = *(c_from1--);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r3 = *(f_from1 + 1);
-    r2 = *(f_from1--);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    r3 = *(f_from1--);
-    r2 = *(f_from1--);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r1 = *(c_from1 + 1);
-    r0 = *(c_from1--);
-    r2 = *(f_from1 - 1);
-    r3 = *(f_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir5 = __SMLADX(r1, r3, ir5);
-    ir4 = __SMLATT(r1, r2, ir4);
-    ir6 = __SMLATT(r1, r3, ir6);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    r0 = *(c_from1 + 1);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMUADX(r0, r3);
-    ir1 = __SMUADX(r1, r3);
-    ir0 = __SMULTT(r1, r2);
-    ir2 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    r2 = *(f_from1++);
-    r3 = *(f_from1++);
-    r0 = *(c_from1 - 1);
-    r1 = *(c_from1++);
-    ir4 = __SMLABB(r0, r2, ir4);
-    ir6 = __SMLABB(r0, r3, ir6);
-    ir5 = __SMLADX(r0, r2, ir5);
-    ir3 = __SMLADX(r0, r3, ir3);
-    ir1 = __SMLADX(r1, r3, ir1);
-    ir0 = __SMLATT(r1, r2, ir0);
-    ir2 = __SMLATT(r1, r3, ir2);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir6 = __SMLAD(r0, r2, ir6);
-    ir0 = __SMLAD(r0, r3, ir0);
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = ir3;
-    r0 = *(c_from1++);
-    r1 = *(c_from1++);
-    ir0 = __SMLABB(r0, r2, ir0);
-    ir2 = __SMLABB(r0, r3, ir2);
-    ir1 = __SMLADX(r0, r2, ir1);
-    ir3 = __SMUADX(r0, r3);
-    ir5 = __SMUADX(r1, r3);
-    ir4 = __SMULTT(r1, r2);
-    ir6 = __SMULTT(r1, r3);
-    ir3 = __SMLADX(r1, r2, ir3);
-    r0 = __PKHBT(r1, r0, 0);
-    ir2 = __SMLAD(r0, r2, ir2);
-    ir4 = __SMLAD(r0, r3, ir4);
-    *(cf++) = ir0;
-    *(cf++) = ir1;
-    *(cf++) = ir2;
-    *(cf++) = ir3;
-    *(cf++) = ir4;
-    *(cf++) = ir5;
-    *(cf++) = ir6;
-    *(cf++) = 0;
-}
-
 static inline void swapptr(uint32_t **ptr1, uint32_t **ptr2) {
     uint32_t *tmp = *ptr1;
     *ptr1 = *ptr2;
@@ -2159,6 +1151,18 @@ void polyf3_jump32divsteps(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, uint
     }
 }
 
+
+extern void polyf3_lsr_asm(uint32_t *);
+extern void polyf3_lsl_asm(uint32_t *);
+
+void polyf3_lsr_fast(uint32_t *tritIn) {
+    polyf3_lsr_asm(tritIn);
+}
+
+void polyf3_lsl_fast(uint32_t *tritIn) {
+    polyf3_lsl_asm(tritIn);
+}
+
 // assert input size = 768
 // serve as in-place division by x
 void polyf3_lsr(uint32_t *tritIn) {
@@ -2189,13 +1193,6 @@ void polyf3_lsr(uint32_t *tritIn) {
     tritIn[46] >>= 1;
     tritIn[47] >>= 1;
 
-}
-
-extern void polyf3_lsr_asm(uint32_t *);
-extern void polyf3_lsl_asm(uint32_t *);
-
-void polyf3_lsr_fast(uint32_t *tritIn) {
-    polyf3_lsr_asm(tritIn);
 }
 
 // assert input size = 768
@@ -2306,8 +1303,54 @@ void polyf3_lsl(uint32_t *tritIn) {
     }
 }
 
-void polyf3_lsl_fast(uint32_t *tritIn) {
-    polyf3_lsl_asm(tritIn);
+extern void polyf3_rol1_32_asm(uint32_t *);
+extern void polyf3_rol1_64_asm(uint32_t *);
+
+void polyf3_rol32_negc_fast(uint32_t *tritIn) {
+    polyf3_rol1_32_asm(tritIn);
+}
+
+void polyf3_rol64_negc_fast(uint32_t *tritIn) {
+    polyf3_rol1_64_asm(tritIn);
+}
+
+// rotate left k trits for corresponding input size
+void polyf3_rol32_negc(uint32_t *tritIn, int k) {
+    uint32_t r0, r1;
+    uint32_t *readOp = tritIn, *writeOp = tritIn;
+    r0 = *(readOp++);
+    r1 = *(readOp++);
+
+    r0 = (r0 << k) | (r0 >> (32 - k));
+    r1 = r1 ^ (r0 << (32 - k));
+    r1 = (r1 << k) | (r1 >> (32 - k));
+
+    *(writeOp++) = r0;
+    *(writeOp++) = r1;
+}
+
+void polyf3_rol64_negc(uint32_t *tritIn, int k) {
+    uint32_t r0, r1, r2, r3, r4, r5;
+    uint32_t *readOp = tritIn, *writeOp = tritIn;
+    r0 = *(readOp++);
+    r1 = *(readOp++);
+    r2 = *(readOp++);
+    r3 = *(readOp++);
+
+    r4 = r0;
+    r5 = r1;
+
+    r0 = (r0 << k) | (r2 >> (32 - k));
+    r2 = (r2 << k) | (r4 >> (32 - k));
+
+    r1 = r1 ^ (r2 >> (32 - k));
+    r1 = (r1 << k) | (r3 >> (32 - k));
+    r3 = (r3 << k) | (r5 >> (32 - k));
+
+    *(writeOp++) = r0;
+    *(writeOp++) = r1;
+    *(writeOp++) = r2;
+    *(writeOp++) = r3;
 }
 
 // assert input size = 768
@@ -2361,4 +1404,66 @@ void polyf3_jump32divsteps768(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, u
             polyf3_lsl_fast(v);
         }
     }
+}
+
+
+void polyf3_butterfly32_CT(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9;
+    uint32_t *readOp1 = tritIn1, *readOp2 = tritIn2, *writeOp1 = tritIn1, *writeOp2 = tritIn2;
+
+    polyf3_rol32_negc(tritIn2, k);
+
+    r0 = *(readOp1++);
+    r1 = *(readOp1++);
+    r2 = *(readOp2++);
+    r3 = *(readOp2++);
+
+    r6 = r1 ^ r2; // r6 = a1 ^ b0
+    r5 = r6 ^ r3; // r5 = (a1 ^ b0) ^ b1
+    r7 = r0 ^ r2; // r7 = a0 ^ b0
+    r5 = r5 ^ r7; // r5 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
+    r4 = r0 ^ r3; // r4 = a0 ^ b1
+    r4 = r4 & r6; // r4 = (a0 ^ b1) & (a1 ^ b0)
+    r8 = r5 & r6; // r8 = (a1 ^ b0 ^ b1) & (a1 ^ b0)
+    r9 = r1 ^ r3; // r9 = a1 ^ b1
+    r9 = r9 | r6; // r9 = (a0 ^ b0) | (a1 ^ b1)
+
+    *(writeOp1++) = r4;
+    *(writeOp1++) = r5;
+    *(writeOp2++) = r8;
+    *(writeOp2++) = r9;
+}
+
+void polyf3_butterfly32_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9;
+    uint32_t *readOp1 = tritIn1, *readOp2 = tritIn2, *writeOp1 = tritIn1, *writeOp2 = tritIn2;
+
+    r0 = *(readOp1++);
+    r1 = *(readOp1++);
+    r2 = *(readOp2++);
+    r3 = *(readOp2++);
+
+    r6 = r1 ^ r2; // r6 = a1 ^ b0
+    r5 = r6 ^ r3; // r5 = (a1 ^ b0) ^ b1
+    r7 = r0 ^ r2; // r7 = a0 ^ b0
+    r5 = r5 ^ r7; // r5 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
+    r4 = r0 ^ r3; // r4 = a0 ^ b1
+    r4 = r4 & r6; // r4 = (a0 ^ b1) & (a1 ^ b0)
+    r8 = r5 & r6; // r8 = (a1 ^ b0 ^ b1) & (a1 ^ b0)
+    r9 = r1 ^ r3; // r9 = a1 ^ b1
+    r9 = r9 | r6; // r9 = (a0 ^ b0) | (a1 ^ b1)
+
+    *(writeOp1++) = r4;
+    *(writeOp1++) = r5;
+    *(writeOp2++) = r8;
+    *(writeOp2++) = r9;
+
+    polyf3_rol32_negc(tritIn2, k);
+}
+
+void polyf3_butterfly64_CT(uint32_t *, uint32_t *, int k) {
+
+}
+void polyf3_butterfly64_GS(uint32_t *, uint32_t *, int k) {
+
 }
