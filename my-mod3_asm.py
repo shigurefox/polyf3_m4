@@ -214,7 +214,6 @@ def print_polyf3_sub_packed():
 #	print('  bne.w unit_sub')
 	print('  pop.w {r4-r12, pc}\n')
 
-
 def print_polyf3_mul_packed():
 	bndry = 1 * 4
 	ldr_regs = ['r3', 'r4', 'r5', 'r6']
@@ -322,19 +321,31 @@ def print_polyf3_lsl():
 	print('  push {r4-r10, lr}')
 	print('  adds r3, #0')
 
-	for it in range(0, count, 4):
+	for it in range(0, count, 8):
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[0], 8 * it))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[1], 8 * it + 8))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[2], 8 * it + 16))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[3], 8 * it + 24))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[4], 8 * it + 32))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[5], 8 * it + 40))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[6], 8 * it + 48))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[7], 8 * it + 56))
 		print('  adcs %s, %s' % (str_regs[0], ldr_regs[0]))
 		print('  adcs %s, %s' % (str_regs[1], ldr_regs[1]))
 		print('  adcs %s, %s' % (str_regs[2], ldr_regs[2]))
 		print('  adcs %s, %s' % (str_regs[3], ldr_regs[3]))
+		print('  adcs %s, %s' % (str_regs[4], ldr_regs[4]))
+		print('  adcs %s, %s' % (str_regs[5], ldr_regs[5]))
+		print('  adcs %s, %s' % (str_regs[6], ldr_regs[6]))
+		print('  adcs %s, %s' % (str_regs[7], ldr_regs[7]))
 		print('  str %s, [r0, #%d]' % (str_regs[0], 8 * it))
 		print('  str %s, [r0, #%d]' % (str_regs[1], 8 * it + 8))
 		print('  str %s, [r0, #%d]' % (str_regs[2], 8 * it + 16))
 		print('  str %s, [r0, #%d]' % (str_regs[3], 8 * it + 24))
+		print('  str %s, [r0, #%d]' % (str_regs[4], 8 * it + 32))
+		print('  str %s, [r0, #%d]' % (str_regs[5], 8 * it + 40))
+		print('  str %s, [r0, #%d]' % (str_regs[6], 8 * it + 48))
+		print('  str %s, [r0, #%d]' % (str_regs[7], 8 * it + 56))
 
 	print('  adds r3, #0')
 	for it in range(0, count, 8):
@@ -342,14 +353,26 @@ def print_polyf3_lsl():
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[1], 8 * it + 12))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[2], 8 * it + 20))
 		print('  ldr %s, [r0, #%d]' % (ldr_regs[3], 8 * it + 28))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[4], 8 * it + 36))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[5], 8 * it + 44))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[6], 8 * it + 52))
+		print('  ldr %s, [r0, #%d]' % (ldr_regs[7], 8 * it + 60))
 		print('  adcs %s, %s' % (str_regs[0], ldr_regs[0]))
 		print('  adcs %s, %s' % (str_regs[1], ldr_regs[1]))
 		print('  adcs %s, %s' % (str_regs[2], ldr_regs[2]))
 		print('  adcs %s, %s' % (str_regs[3], ldr_regs[3]))
+		print('  adcs %s, %s' % (str_regs[4], ldr_regs[4]))
+		print('  adcs %s, %s' % (str_regs[5], ldr_regs[5]))
+		print('  adcs %s, %s' % (str_regs[6], ldr_regs[6]))
+		print('  adcs %s, %s' % (str_regs[7], ldr_regs[7]))
 		print('  str %s, [r0, #%d]' % (str_regs[0], 8 * it + 4))
 		print('  str %s, [r0, #%d]' % (str_regs[1], 8 * it + 12))
 		print('  str %s, [r0, #%d]' % (str_regs[2], 8 * it + 20))
 		print('  str %s, [r0, #%d]' % (str_regs[3], 8 * it + 28))
+		print('  str %s, [r0, #%d]' % (str_regs[4], 8 * it + 32))
+		print('  str %s, [r0, #%d]' % (str_regs[5], 8 * it + 44))
+		print('  str %s, [r0, #%d]' % (str_regs[6], 8 * it + 52))
+		print('  str %s, [r0, #%d]' % (str_regs[7], 8 * it + 60))
 
 	print('  pop {r4-r10, pc}\n')
 

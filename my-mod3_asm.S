@@ -1458,131 +1458,167 @@ polyf3_lsl_asm:
   ldr r4, [r0, #8]
   ldr r5, [r0, #16]
   ldr r6, [r0, #24]
+  ldr r7, [r0, #32]
+  ldr r8, [r0, #40]
+  ldr r9, [r0, #48]
+  ldr r10, [r0, #56]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
   str r3, [r0, #0]
   str r4, [r0, #8]
   str r5, [r0, #16]
   str r6, [r0, #24]
-  ldr r3, [r0, #32]
-  ldr r4, [r0, #40]
-  ldr r5, [r0, #48]
-  ldr r6, [r0, #56]
-  adcs r3, r3
-  adcs r4, r4
-  adcs r5, r5
-  adcs r6, r6
-  str r3, [r0, #32]
-  str r4, [r0, #40]
-  str r5, [r0, #48]
-  str r6, [r0, #56]
+  str r7, [r0, #32]
+  str r8, [r0, #40]
+  str r9, [r0, #48]
+  str r10, [r0, #56]
   ldr r3, [r0, #64]
   ldr r4, [r0, #72]
   ldr r5, [r0, #80]
   ldr r6, [r0, #88]
+  ldr r7, [r0, #96]
+  ldr r8, [r0, #104]
+  ldr r9, [r0, #112]
+  ldr r10, [r0, #120]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
   str r3, [r0, #64]
   str r4, [r0, #72]
   str r5, [r0, #80]
   str r6, [r0, #88]
-  ldr r3, [r0, #96]
-  ldr r4, [r0, #104]
-  ldr r5, [r0, #112]
-  ldr r6, [r0, #120]
-  adcs r3, r3
-  adcs r4, r4
-  adcs r5, r5
-  adcs r6, r6
-  str r3, [r0, #96]
-  str r4, [r0, #104]
-  str r5, [r0, #112]
-  str r6, [r0, #120]
+  str r7, [r0, #96]
+  str r8, [r0, #104]
+  str r9, [r0, #112]
+  str r10, [r0, #120]
   ldr r3, [r0, #128]
   ldr r4, [r0, #136]
   ldr r5, [r0, #144]
   ldr r6, [r0, #152]
+  ldr r7, [r0, #160]
+  ldr r8, [r0, #168]
+  ldr r9, [r0, #176]
+  ldr r10, [r0, #184]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
   str r3, [r0, #128]
   str r4, [r0, #136]
   str r5, [r0, #144]
   str r6, [r0, #152]
-  ldr r3, [r0, #160]
-  ldr r4, [r0, #168]
-  ldr r5, [r0, #176]
-  ldr r6, [r0, #184]
-  adcs r3, r3
-  adcs r4, r4
-  adcs r5, r5
-  adcs r6, r6
-  str r3, [r0, #160]
-  str r4, [r0, #168]
-  str r5, [r0, #176]
-  str r6, [r0, #184]
+  str r7, [r0, #160]
+  str r8, [r0, #168]
+  str r9, [r0, #176]
+  str r10, [r0, #184]
   adds r3, #0
   ldr r3, [r0, #4]
   ldr r4, [r0, #12]
   ldr r5, [r0, #20]
   ldr r6, [r0, #28]
+  ldr r7, [r0, #36]
+  ldr r8, [r0, #44]
+  ldr r9, [r0, #52]
+  ldr r10, [r0, #60]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
   str r3, [r0, #4]
   str r4, [r0, #12]
   str r5, [r0, #20]
   str r6, [r0, #28]
+  str r7, [r0, #32]
+  str r8, [r0, #44]
+  str r9, [r0, #52]
+  str r10, [r0, #60]
   ldr r3, [r0, #68]
   ldr r4, [r0, #76]
   ldr r5, [r0, #84]
   ldr r6, [r0, #92]
+  ldr r7, [r0, #100]
+  ldr r8, [r0, #108]
+  ldr r9, [r0, #116]
+  ldr r10, [r0, #124]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
   str r3, [r0, #68]
   str r4, [r0, #76]
   str r5, [r0, #84]
   str r6, [r0, #92]
+  str r7, [r0, #96]
+  str r8, [r0, #108]
+  str r9, [r0, #116]
+  str r10, [r0, #124]
   ldr r3, [r0, #132]
   ldr r4, [r0, #140]
   ldr r5, [r0, #148]
   ldr r6, [r0, #156]
+  ldr r7, [r0, #164]
+  ldr r8, [r0, #172]
+  ldr r9, [r0, #180]
+  ldr r10, [r0, #188]
   adcs r3, r3
   adcs r4, r4
   adcs r5, r5
   adcs r6, r6
+  adcs r7, r7
+  adcs r8, r8
+  adcs r9, r9
+  adcs r10, r10
   str r3, [r0, #132]
   str r4, [r0, #140]
   str r5, [r0, #148]
   str r6, [r0, #156]
+  str r7, [r0, #160]
+  str r8, [r0, #172]
+  str r9, [r0, #180]
+  str r10, [r0, #188]
   pop {r4-r10, pc}
 
 .global polyf3_rol1_32_asm
 .type polyf3_rol1_32_asm, %function
 @ void polyf3_rol1_32_asm(uint32_t *tritIn)
-polyf3_ror1_32_asm:
-  push.w {lr}
-  mov.w r1, r0
-  ldr.w r2, [r0], #4
-  ldr.w r3, [r0], #4
-  ror.w r2, r2, #31
-  eor.w r3, r3, r2, LSL #31
-  ror.w r3, r3, #31
-  str.w r2, [r1], #4
-  str.w r3, [r1], #4
-  pop.w {pc}
+polyf3_rol1_32_asm:
+  push {lr}
+  mov r1, r0
+  ldr r2, [r0], #4
+  ldr r3, [r0], #4
+  ror r2, r2, #31
+  eor r3, r3, r2, LSL #31
+  ror r3, r3, #31
+  str r2, [r1], #4
+  str r3, [r1], #4
+  pop {pc}
 .global polyf3_rol1_64_asm
 .type polyf3_rol1_64_asm, %function
 @ void polyf3_rol1_64_asm(uint32_t *tritIn)
-polyf3_ror1_64_asm:
+polyf3_rol1_64_asm:
   push.w {r4-r12, lr}
   mov.w r1, r0
   ldr.w r2, [r0], #4

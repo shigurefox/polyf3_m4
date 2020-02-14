@@ -1455,8 +1455,8 @@ void polyf3_butterfly32_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
 
     *(writeOp1++) = r4;
     *(writeOp1++) = r5;
-    *(writeOp2++) = r8;
-    *(writeOp2++) = r9;
+    *(writeOp2++) = r6;
+    *(writeOp2++) = r7;
 
     polyf3_rol32_negc(tritIn2, k);
 }
@@ -1490,7 +1490,7 @@ void polyf3_butterfly64_CT(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
     }
 }
 
-void polyf3_butterfly64_GS(uint32_t *, uint32_t *, int k) {
+void polyf3_butterfly64_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9;
     uint32_t *readOp1 = tritIn1, *readOp2 = tritIn2, *writeOp1 = tritIn1, *writeOp2 = tritIn2;
 
