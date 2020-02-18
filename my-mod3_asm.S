@@ -90,7 +90,7 @@ unit_pack:
 @ void polyf3_unpack_asm(uint32_t* mod3Out, uint32_t* tritIn)
 polyf3_unpack_asm:
   push.w {r4-r12, lr}
-  add.w r2, r1, #192
+  add.w r2, r1, #384
 unit_unpack:
   ldr.w r3, [r1], #4
   ldr.w r4, [r1], #4
