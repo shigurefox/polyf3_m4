@@ -1,5 +1,11 @@
+#include "libopencm3/cm3/dwt.h"
 #include "my-mod3.h"
 #include "cmsis.h"
+#include <stdio.h>
+
+#define start_timer() dwt_enable_cycle_counter()
+#define get_timer() dwt_read_cycle_counter()
+#define stop_timer() *((volatile uint32_t*)0xE0001000) = 0x40000000
 
 extern void polyf3_pack_asm(uint32_t *, uint32_t *);
 extern void polyf3_unpack_asm(uint32_t *, uint32_t *);
@@ -1315,7 +1321,7 @@ void polyf3_rol64_negc_fast(uint32_t *tritIn) {
 }
 
 // rotate left k trits for corresponding input size
-void polyf3_rol32_negc(uint32_t *tritIn, int k) {
+inline void polyf3_rol32_negc(uint32_t *tritIn, int k) {
     uint32_t r0, r1;
     uint32_t *readOp = tritIn, *writeOp = tritIn;
     r0 = *(readOp++);
@@ -1329,7 +1335,7 @@ void polyf3_rol32_negc(uint32_t *tritIn, int k) {
     *(writeOp++) = r1;
 }
 
-void polyf3_rol64_negc(uint32_t *tritIn, int k) {
+inline void polyf3_rol64_negc(uint32_t *tritIn, int k) {
     uint32_t r0, r1, r2, r3, r4, r5;
     uint32_t *readOp = tritIn, *writeOp = tritIn;
     r0 = *(readOp++);
@@ -1344,6 +1350,7 @@ void polyf3_rol64_negc(uint32_t *tritIn, int k) {
     r2 = (r2 << k) | (r4 >> (32 - k));
 
     r1 = r1 ^ (r2 >> (32 - k));
+
     r1 = (r1 << k) | (r3 >> (32 - k));
     r3 = (r3 << k) | (r5 >> (32 - k));
 
@@ -1419,14 +1426,15 @@ void polyf3_butterfly32_CT(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
     r3 = *(readOp2++);
 
     r8 = r1 ^ r2; // r8 = a1 ^ b0
-    r5 = r8 ^ r3; // r5 = (a1 ^ b0) ^ b1
+    r4 = r8 ^ r3; // r4 = (a1 ^ b0) ^ b1
     r9 = r0 ^ r2; // r9 = a0 ^ b0
-    r4 = r0 ^ r3; // r4 = a0 ^ b1
-    r4 = r4 & r8; // r4 = (a0 ^ b1) & (a1 ^ b0)
-    r6 = r5 & r8; // r6 = (a1 ^ b0 ^ b1) & (a1 ^ b0)
-    r5 = r5 | r9; // r5 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
-    r7 = r1 ^ r3; // r7 = a1 ^ b1
-    r7 = r7 | r9; // r7 = (a0 ^ b0) | (a1 ^ b1)
+    r5 = r0 ^ r3; // r5 = a0 ^ b1
+    r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
+    r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+    r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+    r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
+    r6 = r1 ^ r3; // r6 = a1 ^ b1
+    r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
 
     *(writeOp1++) = r4;
     *(writeOp1++) = r5;
@@ -1444,14 +1452,15 @@ void polyf3_butterfly32_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
     r3 = *(readOp2++);
 
     r8 = r1 ^ r2; // r8 = a1 ^ b0
-    r5 = r8 ^ r3; // r5 = (a1 ^ b0) ^ b1
+    r4 = r8 ^ r3; // r4 = (a1 ^ b0) ^ b1
     r9 = r0 ^ r2; // r9 = a0 ^ b0
-    r4 = r0 ^ r3; // r4 = a0 ^ b1
-    r4 = r4 & r8; // r4 = (a0 ^ b1) & (a1 ^ b0)
-    r6 = r5 & r8; // r6 = (a1 ^ b0 ^ b1) & (a1 ^ b0)
-    r5 = r5 | r9; // r5 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
-    r7 = r1 ^ r3; // r7 = a1 ^ b1
-    r7 = r7 | r9; // r7 = (a0 ^ b0) | (a1 ^ b1)
+    r5 = r0 ^ r3; // r5 = a0 ^ b1
+    r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
+    r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+    r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+    r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
+    r6 = r1 ^ r3; // r6 = a1 ^ b1
+    r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
 
     *(writeOp1++) = r4;
     *(writeOp1++) = r5;
@@ -1474,14 +1483,15 @@ void polyf3_butterfly64_CT(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
         r3 = *(readOp2++);
 
         r8 = r1 ^ r2; // r8 = a1 ^ b0
-        r5 = r8 ^ r3; // r5 = (a1 ^ b0) ^ b1
+        r4 = r8 ^ r3; // r4 = (a1 ^ b0) ^ b1
         r9 = r0 ^ r2; // r9 = a0 ^ b0
-        r4 = r0 ^ r3; // r4 = a0 ^ b1
-        r4 = r4 & r8; // r4 = (a0 ^ b1) & (a1 ^ b0)
-        r6 = r5 & r8; // r6 = ((a1 ^ b0) ^ b1) & (a1 ^ b0)
-        r5 = r5 | r9; // r5 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
-        r7 = r1 ^ r3; // r7 = a1 ^ b1
-        r7 = r7 | r9; // r7 = (a0 ^ b0) | (a1 ^ b1)
+        r5 = r0 ^ r3; // r5 = a0 ^ b1
+        r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
+        r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+        r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+        r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
+        r6 = r1 ^ r3; // r6 = a1 ^ b1
+        r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
 
         *(writeOp1++) = r4;
         *(writeOp1++) = r5;
@@ -1501,14 +1511,15 @@ void polyf3_butterfly64_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
         r3 = *(readOp2++);
 
         r8 = r1 ^ r2; // r8 = a1 ^ b0
-        r5 = r8 ^ r3; // r5 = (a1 ^ b0) ^ b1
+        r4 = r8 ^ r3; // r4 = (a1 ^ b0) ^ b1
         r9 = r0 ^ r2; // r9 = a0 ^ b0
-        r4 = r0 ^ r3; // r4 = a0 ^ b1
-        r4 = r4 & r8; // r4 = (a0 ^ b1) & (a1 ^ b0)
-        r6 = r5 & r8; // r6 = ((a1 ^ b0) ^ b1) & (a1 ^ b0)
-        r5 = r5 | r9; // r5 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
-        r7 = r1 ^ r3; // r7 = a1 ^ b1
-        r7 = r7 | r9; // r7 = (a0 ^ b0) | (a1 ^ b1)
+        r5 = r0 ^ r3; // r5 = a0 ^ b1
+        r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
+        r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+        r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+        r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
+        r6 = r1 ^ r3; // r6 = a1 ^ b1
+        r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
 
         *(writeOp1++) = r4;
         *(writeOp1++) = r5;
