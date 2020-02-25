@@ -1321,7 +1321,7 @@ void polyf3_rol64_negc_fast(uint32_t *tritIn) {
 }
 
 // rotate left k trits for corresponding input size
-void polyf3_rol32_negc(uint32_t *tritIn, int k) {
+inline void polyf3_rol32_negc(uint32_t *tritIn, int k) {
     uint32_t r0, r1;
     uint32_t *readOp = tritIn, *writeOp = tritIn;
     r0 = *(readOp++);
@@ -1335,7 +1335,7 @@ void polyf3_rol32_negc(uint32_t *tritIn, int k) {
     *(writeOp++) = r1;
 }
 
-void polyf3_rol64_negc(uint32_t *tritIn, int k) {
+inline void polyf3_rol64_negc(uint32_t *tritIn, int k) {
     uint32_t r0, r1, r2, r3, r4, r5;
     uint32_t *readOp = tritIn, *writeOp = tritIn;
     r0 = *(readOp++);
@@ -1430,8 +1430,8 @@ void polyf3_butterfly32_CT(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
     r9 = r0 ^ r2; // r9 = a0 ^ b0
     r5 = r0 ^ r3; // r5 = a0 ^ b1
     r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
-    r7 = r9 ^ r3; // r7 = (a0 ^ b0) ^ b1
-    r7 = r7 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+    r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+    r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
     r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
     r6 = r1 ^ r3; // r6 = a1 ^ b1
     r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
@@ -1456,8 +1456,8 @@ void polyf3_butterfly32_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
     r9 = r0 ^ r2; // r9 = a0 ^ b0
     r5 = r0 ^ r3; // r5 = a0 ^ b1
     r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
-    r7 = r9 ^ r3; // r7 = (a0 ^ b0) ^ b1
-    r7 = r7 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+    r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+    r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
     r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
     r6 = r1 ^ r3; // r6 = a1 ^ b1
     r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
@@ -1487,8 +1487,8 @@ void polyf3_butterfly64_CT(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
         r9 = r0 ^ r2; // r9 = a0 ^ b0
         r5 = r0 ^ r3; // r5 = a0 ^ b1
         r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
-        r7 = r9 ^ r3; // r7 = (a0 ^ b0) ^ b1
-        r7 = r7 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+        r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+        r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
         r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
         r6 = r1 ^ r3; // r6 = a1 ^ b1
         r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
@@ -1515,8 +1515,8 @@ void polyf3_butterfly64_GS(uint32_t *tritIn1, uint32_t *tritIn2, int k) {
         r9 = r0 ^ r2; // r9 = a0 ^ b0
         r5 = r0 ^ r3; // r5 = a0 ^ b1
         r5 = r5 & r8; // r5 = (a0 ^ b1) & (a1 ^ b0)
-        r7 = r9 ^ r3; // r7 = (a0 ^ b0) ^ b1
-        r7 = r7 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
+        r7 = r9 ^ r3; // r7 = (a1 ^ b0) ^ b1
+        r7 = r4 & r8; // r7 = ((a0 ^ b0) ^ b1) & (a1 ^ b0)
         r4 = r4 | r9; // r4 = ((a1 ^ b0) ^ b1) | (a0 ^ b0)
         r6 = r1 ^ r3; // r6 = a1 ^ b1
         r6 = r6 | r9; // r6 = (a0 ^ b0) | (a1 ^ b1)
