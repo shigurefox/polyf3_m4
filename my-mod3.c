@@ -1361,6 +1361,7 @@ void polyf3_rol64_negc(uint32_t *tritIn, int k) {
 }
 
 // assert input size = 768
+// TODO: extract update of f and g to another function
 void polyf3_j32d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
     uint32_t r0, r1, r2, r3, r4[2], r6;
     uint32_t *u, *v, *r, *s;
@@ -1462,10 +1463,10 @@ void polyf3_mmul32(uint32_t c[], uint32_t a[], uint32_t b[]) {
     uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
     uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
 
-    bs3_mul32_fast(ures, u1, u2);
-    bs3_mul32_fast(vres, v1, v2);
-    bs3_mul32_fast(rres, r1, r2);
-    bs3_mul32_fast(sres, s1, s2);
+    bs3_mul32(ures, u1, u2);
+    bs3_mul32(vres, v1, v2);
+    bs3_mul32(rres, r1, r2);
+    bs3_mul32(sres, s1, s2);
 }
 
 void polyf3_mmul64(uint32_t c[], uint32_t a[], uint32_t b[]) {
@@ -1473,10 +1474,10 @@ void polyf3_mmul64(uint32_t c[], uint32_t a[], uint32_t b[]) {
     uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
     uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
 
-    bs3_mul64_fast(ures, u1, u2);
-    bs3_mul64_fast(vres, v1, v2);
-    bs3_mul64_fast(rres, r1, r2);
-    bs3_mul64_fast(sres, s1, s2);
+    bs3_mul64(ures, u1, u2);
+    bs3_mul64(vres, v1, v2);
+    bs3_mul64(rres, r1, r2);
+    bs3_mul64(sres, s1, s2);
 }
 
 void polyf3_mmul128(uint32_t c[], uint32_t a[], uint32_t b[]) {
@@ -1484,10 +1485,10 @@ void polyf3_mmul128(uint32_t c[], uint32_t a[], uint32_t b[]) {
     uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
     uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
 
-    bs3_mul128_fast(ures, u1, u2);
-    bs3_mul128_fast(vres, v1, v2);
-    bs3_mul128_fast(rres, r1, r2);
-    bs3_mul128_fast(sres, s1, s2);
+    bs3_mul128(ures, u1, u2);
+    bs3_mul128(vres, v1, v2);
+    bs3_mul128(rres, r1, r2);
+    bs3_mul128(sres, s1, s2);
 }
 
 void polyf3_mmul256(uint32_t c[], uint32_t a[], uint32_t b[]) {
@@ -1495,10 +1496,10 @@ void polyf3_mmul256(uint32_t c[], uint32_t a[], uint32_t b[]) {
     uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
     uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
 
-    bs3_mul256_fast(ures, u1, u2);
-    bs3_mul256_fast(vres, v1, v2);
-    bs3_mul256_fast(rres, r1, r2);
-    bs3_mul256_fast(sres, s1, s2);
+    bs3_mul256(ures, u1, u2);
+    bs3_mul256(vres, v1, v2);
+    bs3_mul256(rres, r1, r2);
+    bs3_mul256(sres, s1, s2);
 }
 
 
