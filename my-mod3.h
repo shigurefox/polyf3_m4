@@ -7,6 +7,12 @@ void polyf3_sub_packed(uint32_t *, uint32_t *, uint32_t *);
 void polyf3_mul_packed(uint32_t *, uint32_t *, uint32_t *);
 void polyf3_mul_scalar_packed(uint32_t *, uint32_t[2], uint32_t *);
 
+void polyf3_add32(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_add64(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_add128(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_add256(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_add512(uint32_t *, uint32_t *, uint32_t *);
+
 void polyf3_pack_fast(uint32_t *, uint32_t *);
 void polyf3_unpack_fast(uint32_t *, uint32_t *);
 void polyf3_add_packed_fast(uint32_t *, uint32_t *, uint32_t *);
@@ -27,6 +33,10 @@ void polyf3_mmul32(uint32_t *, uint32_t *, uint32_t *);
 void polyf3_mmul64(uint32_t *, uint32_t *, uint32_t *);
 void polyf3_mmul128(uint32_t *, uint32_t *, uint32_t *);
 void polyf3_mmul256(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_update32(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_update64(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_update128(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_update256(uint32_t *, uint32_t *, uint32_t *);
 
 void polyf3_lsr(uint32_t *);
 void polyf3_lsl(uint32_t *);
