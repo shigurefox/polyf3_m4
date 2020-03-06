@@ -203,9 +203,7 @@ def compose_output_coefs():
 			print('  ldr.w %s, [r0, #%d]' % (tmp_reg[rid + MAX_MOVE], unit_size + rid * 4))
 		for rid in range(MAX_MOVE):
 			print('  sub.w %s, r11, %s' % (tmp_reg[rid], tmp_reg[rid]))
-			print('  add.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
-			print('  usub8.w %s, %s, r11' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
-			print('  sel.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
+			print('  add.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid])) #1-5
 		for rid in range(MAX_MOVE): print('  str.w %s, [r0], #4' % (tmp_reg[rid]))
 		if unit_size > 16:
 			print('  cmp.w r0, lr')
@@ -219,10 +217,8 @@ def compose_output_coefs():
 			print('  ldr.w %s, [r0, #-4]!' % (tmp_reg[rid + MAX_MOVE]))
 			print('  ldr.w %s, [r0, #%d]' % (tmp_reg[rid], unit_size * 2))
 		for rid in range(MAX_MOVE):
-			print('  sub.w %s, r11, %s' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid + MAX_MOVE]))
-			print('  add.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid], tmp_reg[rid + MAX_MOVE]))
-			print('  usub8.w %s, %s, r11' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
-			print('  sel.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
+			print('  rsb.w %s, %s, r11, lsl #1' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid + MAX_MOVE]))
+			print('  add.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid], tmp_reg[rid + MAX_MOVE])) #1-7
 		for rid in range(MAX_MOVE): print('  str.w %s, [r0, #%d]' % (tmp_reg[rid], unit_size + 4 * (MAX_MOVE - rid - 1)))
 		if unit_size > 16:
 			print('  cmp.w r0, lr')
@@ -237,9 +233,7 @@ def compose_output_coefs():
 			print('  ldr.w %s, [r0, #-4]!' % (tmp_reg[rid + MAX_MOVE]))
 			print('  ldr.w %s, [r0, #%d]' % (tmp_reg[rid], unit_size))
 		for rid in range(MAX_MOVE):
-			print('  add.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid], tmp_reg[rid + MAX_MOVE]))
-			print('  usub8.w %s, %s, r11' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
-			print('  sel.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
+			print('  add.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid], tmp_reg[rid + MAX_MOVE])) #1-7
 		for rid in range(MAX_MOVE): print('  str.w %s, [r0, #%d]' % (tmp_reg[rid], unit_size + 4 * (MAX_MOVE - rid - 1)))
 		if unit_size > 16:
 			print('  cmp.w r0, lr')
@@ -266,8 +260,11 @@ def compose_output_coefs():
 		for rid in range(MAX_MOVE): print('  ldr.w %s, [r12, #%d]' % (tmp_jump_reg[rid], rid * 4))
 		for rid in range(MAX_MOVE): print('  ldr.w %s, [lr], #4' % (tmp_jump_reg[rid + MAX_MOVE]))
 		for rid in range(MAX_MOVE):
-			print('  sub.w %s, r11, %s' % (tmp_jump_reg[rid], tmp_jump_reg[rid]))
-			print('  add.w %s, %s, %s' % (tmp_jump_reg[rid], tmp_jump_reg[rid + MAX_MOVE], tmp_jump_reg[rid]))
+			print('  rsb.w %s, %s, r11, lsl #2' % (tmp_jump_reg[rid], tmp_jump_reg[rid]))
+			print('  add.w %s, %s, %s' % (tmp_jump_reg[rid], tmp_jump_reg[rid + MAX_MOVE], tmp_jump_reg[rid])) #5-13
+			print('  and.w %s, %s, r11' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
+			print('  bic.w %s, %s, r11' % (tmp_reg[rid], tmp_reg[rid]))
+			print('  add.w %s, %s, %s, lsr #2' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
 			print('  usub8.w %s, %s, r11' % (tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
 			print('  sel.w %s, %s, %s' % (tmp_reg[rid], tmp_reg[rid + MAX_MOVE], tmp_reg[rid]))
 		for rid in range(MAX_MOVE):
