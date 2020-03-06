@@ -13,6 +13,137 @@ extern void polyf3_add_packed_asm(uint32_t *, uint32_t *, uint32_t *);
 extern void polyf3_sub_packed_asm(uint32_t *, uint32_t *, uint32_t *);
 extern void polyf3_mul_packed_asm(uint32_t *, uint32_t *, uint32_t *);
 
+extern void bs3_mul32(uint32_t *, uint32_t *, uint32_t *);
+extern void bs3_mul64(uint32_t *, uint32_t *, uint32_t *);
+extern void bs3_mul128(uint32_t *, uint32_t *, uint32_t *);
+extern void bs3_mul256(uint32_t *, uint32_t *, uint32_t *);
+extern void bs3_jump32divsteps(int32_t, uint32_t *, uint32_t *, uint32_t *);
+
+
+void polyf3_selftest_add() {
+    start_timer();
+    uint32_t f[48] = {1}, g[48] = {0}, h[96] = {0};
+    uint32_t t0, t1;
+
+    t0 = get_timer();
+    polyf3_add32(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_add32: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_add64(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_add64: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_add128(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_add128: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_add256(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_add256: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_add512(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_add512: %ld\n", t1-t0);
+
+    stop_timer();
+}
+
+void polyf3_selftest_sub() {
+    start_timer();
+    uint32_t f[48] = {1}, g[48] = {0}, h[96] = {0};
+    uint32_t t0, t1;
+
+    t0 = get_timer();
+    polyf3_sub32(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_sub32: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_sub64(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_sub64: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_sub128(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_sub128: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_sub256(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_sub256: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_sub512(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for polyf3_sub512: %ld\n", t1-t0);
+
+    stop_timer();
+}
+
+void polyf3_selftest_mul() {
+    start_timer();
+    uint32_t f[48] = {1}, g[48] = {0}, h[96] = {0};
+    uint32_t t0, t1;
+
+    t0 = get_timer();
+    bs3_mul32(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for bs3_mul32: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    bs3_mul64(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for bs3_mul64: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    bs3_mul128(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for bs3_mul128: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    bs3_mul256(h, f, g);
+    t1 = get_timer();
+    printf("Elapsed cycles for bs3_mul256: %ld\n", t1-t0);
+
+    stop_timer();
+}
+
+void polyf3_selftest_mmuls() {
+    start_timer();
+    uint32_t f[48] = {1}, g[48] = {0}, h[96] = {0};
+    uint32_t t0, t1;
+    uint32_t uvrs[192] = {[0] = 1, [144] = 1};
+	uint32_t uvrs1[192] = {[0] = 1, [144] = 1}, uvrs2[192] = {[0] = 1, [144] = 1};
+
+    t0 = get_timer();
+    polyf3_mmul32s(uvrs, uvrs1, uvrs2);
+    t1 = get_timer();
+    printf("Elapsed cycles for mmul32s: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_mmul64s(uvrs, uvrs1, uvrs2);
+    t1 = get_timer();
+    printf("Elapsed cycles for mmul64s: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_mmul128s(uvrs, uvrs1, uvrs2);
+    t1 = get_timer();
+    printf("Elapsed cycles for mmul128s: %ld\n", t1-t0);
+
+    t0 = get_timer();
+    polyf3_mmul256s(uvrs, uvrs1, uvrs2);
+    t1 = get_timer();
+    printf("Elapsed cycles for mmul256s: %ld\n", t1-t0);
+
+    stop_timer();
+}
+
 void polyf3_pack_fast(uint32_t *tritOut, uint32_t *mod3In) {
     polyf3_pack_asm(tritOut, mod3In);
 }
@@ -1153,6 +1284,197 @@ void polyf3_add512(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
     }
 }
 
+void polyf3_sub32(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    uint32_t r0, r1, r2, r3, r8;
+    uint32_t *readOp1, *readOp2, *writeSum;
+
+    readOp1 = tritIn1;
+    readOp2 = tritIn2;
+    writeSum = tritOut;
+
+    r0 = *(readOp1++); // a0
+    r1 = *(readOp1++); // a1
+    r2 = *(readOp2++); // b0
+    r3 = *(readOp2++); // b1
+
+    r8 = r0 ^ r2;
+    r0 = r1 ^ r3;
+    r0 = r0 | r8;
+    r8 = r8 ^ r3;
+    r1 = r1 ^ r2;
+    r1 = r1 & r8;
+
+    *(writeSum++) = r0;
+    *(writeSum++) = r1;
+}
+
+void polyf3_sub64(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8;
+    uint32_t *readOp1, *readOp2, *writeSum;
+
+    readOp1 = tritIn1;
+    readOp2 = tritIn2;
+    writeSum = tritOut;
+
+    r0 = *(readOp1++); // a0
+    r1 = *(readOp1++); // a1
+    r2 = *(readOp2++); // b0
+    r3 = *(readOp2++); // b1
+
+    r4 = *(readOp1++); // a0
+    r5 = *(readOp1++); // a1
+    r6 = *(readOp2++); // b0
+    r7 = *(readOp2++); // b1
+
+    r8 = r0 ^ r2;
+    r0 = r1 ^ r3;
+    r0 = r0 | r8;
+    r8 = r8 ^ r3;
+    r1 = r1 ^ r2;
+    r1 = r1 & r8;
+
+    r8 = r4 ^ r6;
+    r4 = r5 ^ r7;
+    r4 = r4 | r8;
+    r8 = r8 ^ r7;
+    r5 = r5 ^ r6;
+    r5 = r5 & r8;
+
+    *(writeSum++) = r0;
+    *(writeSum++) = r1;
+    *(writeSum++) = r4;
+    *(writeSum++) = r5;
+}
+
+void polyf3_sub128(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8;
+    uint32_t *readOp1, *readOp2, *writeSum;
+
+    readOp1 = tritIn1;
+    readOp2 = tritIn2;
+    writeSum = tritOut;
+
+    for (int i = 0; i < 2; i++) {
+        r0 = *(readOp1++); // a0
+        r1 = *(readOp1++); // a1
+        r2 = *(readOp2++); // b0
+        r3 = *(readOp2++); // b1
+
+        r4 = *(readOp1++); // a0
+        r5 = *(readOp1++); // a1
+        r6 = *(readOp2++); // b0
+        r7 = *(readOp2++); // b1
+
+        r8 = r0 ^ r2;
+        r0 = r1 ^ r3;
+        r0 = r0 | r8;
+        r8 = r8 ^ r3;
+        r1 = r1 ^ r2;
+        r1 = r1 & r8;
+
+        r8 = r4 ^ r6;
+        r4 = r5 ^ r7;
+        r4 = r4 | r8;
+        r8 = r8 ^ r7;
+        r5 = r5 ^ r6;
+        r5 = r5 & r8;
+
+        *(writeSum++) = r0;
+        *(writeSum++) = r1;
+        *(writeSum++) = r4;
+        *(writeSum++) = r5;
+    }
+}
+
+void polyf3_sub256(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8;
+    uint32_t *readOp1, *readOp2, *writeSum;
+
+    readOp1 = tritIn1;
+    readOp2 = tritIn2;
+    writeSum = tritOut;
+
+    for (int i = 0; i < 4; i++) {
+        r0 = *(readOp1++); // a0
+        r1 = *(readOp1++); // a1
+        r2 = *(readOp2++); // b0
+        r3 = *(readOp2++); // b1
+
+        r4 = *(readOp1++); // a0
+        r5 = *(readOp1++); // a1
+        r6 = *(readOp2++); // b0
+        r7 = *(readOp2++); // b1
+
+        r8 = r0 ^ r2;
+        r0 = r1 ^ r3;
+        r0 = r0 | r8;
+        r8 = r8 ^ r3;
+        r1 = r1 ^ r2;
+        r1 = r1 & r8;
+
+        r8 = r4 ^ r6;
+        r4 = r5 ^ r7;
+        r4 = r4 | r8;
+        r8 = r8 ^ r7;
+        r5 = r5 ^ r6;
+        r5 = r5 & r8;
+
+        *(writeSum++) = r0;
+        *(writeSum++) = r1;
+        *(writeSum++) = r4;
+        *(writeSum++) = r5;
+    }
+}
+
+void polyf3_sub512(uint32_t *tritOut, uint32_t *tritIn1, uint32_t *tritIn2) {
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8;
+    uint32_t *readOp1, *readOp2, *writeSum;
+
+    readOp1 = tritIn1;
+    readOp2 = tritIn2;
+    writeSum = tritOut;
+
+    for (int i = 0; i < 8; i++) {
+        r0 = *(readOp1++); // a0
+        r1 = *(readOp1++); // a1
+        r2 = *(readOp2++); // b0
+        r3 = *(readOp2++); // b1
+
+        r4 = *(readOp1++); // a0
+        r5 = *(readOp1++); // a1
+        r6 = *(readOp2++); // b0
+        r7 = *(readOp2++); // b1
+
+        r8 = r0 ^ r2;
+        r0 = r1 ^ r3;
+        r0 = r0 | r8;
+        r8 = r8 ^ r3;
+        r1 = r1 ^ r2;
+        r1 = r1 & r8;
+
+        r8 = r4 ^ r6;
+        r4 = r5 ^ r7;
+        r4 = r4 | r8;
+        r8 = r8 ^ r7;
+        r5 = r5 ^ r6;
+        r5 = r5 & r8;
+
+        *(writeSum++) = r0;
+        *(writeSum++) = r1;
+        *(writeSum++) = r4;
+        *(writeSum++) = r5;
+    }
+}
+
+void polyf3_mul256x512(uint32_t *tritOut, uint32_t *trit256, uint32_t *trit512) {
+    uint32_t temp[48] = {0};
+
+    bs3_mul256(tritOut, trit256, trit512);
+    bs3_mul256(temp, trit256, trit512 + 16);
+    polyf3_add512(tritOut + 16, tritOut + 16, temp);
+}
+
+
 static inline void swapptr(uint32_t **ptr1, uint32_t **ptr2) {
     uint32_t *tmp = *ptr1;
     *ptr1 = *ptr2;
@@ -1169,42 +1491,6 @@ static inline void swapptr(uint32_t **ptr1, uint32_t **ptr2) {
     */
 }
 
-void polyf3_swap768(uint32_t *tritIn1, uint32_t *tritIn2) {
-    uint32_t r2, r3, r4, r5, r6, r7, r8, r9;
-    uint32_t *readOp1 = tritIn1, *readOp2 = tritIn2, *writeOp1 = tritIn2, *writeOp2 = tritIn1;
-    for (int i = 0; i < 12; i++) {
-        r2 = *(readOp1++);
-        r3 = *(readOp1++);
-        r4 = *(readOp1++);
-        r5 = *(readOp1++);
-        r6 = *(readOp2++);
-        r7 = *(readOp2++);
-        r8 = *(readOp2++);
-        r9 = *(readOp2++);
-        /*
-        r2 = r2 ^ r6;
-        r6 = r2 ^ r6;
-        r2 = r2 ^ r6;
-        r3 = r3 ^ r7;
-        r7 = r3 ^ r7;
-        r3 = r3 ^ r7;
-        r4 = r4 ^ r8;
-        r8 = r4 ^ r8;
-        r4 = r4 ^ r8;
-        r5 = r5 ^ r9;
-        r9 = r5 ^ r9;
-        r5 = r5 ^ r9;
-        */
-        *(writeOp1++) = r2;
-        *(writeOp1++) = r3;
-        *(writeOp1++) = r4;
-        *(writeOp1++) = r5;
-        *(writeOp2++) = r6;
-        *(writeOp2++) = r7;
-        *(writeOp2++) = r8;
-        *(writeOp2++) = r9;
-    }
-}
 
 void polyf3_divstep(int32_t delta, uint32_t *tritIn1, uint32_t *tritIn2) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
@@ -1250,6 +1536,7 @@ void polyf3_divstep(int32_t delta, uint32_t *tritIn1, uint32_t *tritIn2) {
 
 
 // assert input size = 32
+/*
 void polyf3_j32d(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[4]) {
     uint32_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
     uint32_t *readOp1, *readOp2, *writeOp, *u, *v, *r, *s;
@@ -1334,10 +1621,12 @@ void polyf3_j32d(int32_t d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[
         }
     }
 }
-
+*/
 
 extern void polyf3_lsr_asm(uint32_t *);
 extern void polyf3_lsl_asm(uint32_t *);
+extern void polyf3_rol1_32_asm(uint32_t *);
+extern void polyf3_rol1_64_asm(uint32_t *);
 
 void polyf3_lsr_fast(uint32_t *tritIn) {
     polyf3_lsr_asm(tritIn);
@@ -1487,8 +1776,6 @@ void polyf3_lsl(uint32_t *tritIn) {
     }
 }
 
-extern void polyf3_rol1_32_asm(uint32_t *);
-extern void polyf3_rol1_64_asm(uint32_t *);
 
 void polyf3_rol32_negc_fast(uint32_t *tritIn) {
     polyf3_rol1_32_asm(tritIn);
@@ -1553,9 +1840,9 @@ void polyf3_j32d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t u
     int delta = *d;
     for (int i = 32; i > 0; i--) {
         if ((delta > 0) && ((r2 & 1) != 0)) {
-            swapptr(&tritIn1, &tritIn2);
-            polyf3_swap768(u, r);
-            polyf3_swap768(v, s);
+            polyf3_swap32(tritIn, tritIn2);
+            polyf3_swap32(u, r);
+            polyf3_swap32(v, s);
             delta = -delta;
         }
         delta++;
@@ -1595,47 +1882,48 @@ void polyf3_j32d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t u
 }
 */
 
-extern void bs3_j32d(int32_t *d , uint32_t *, uint32_t *, uint32_t *);
 
 void polyf3_j32d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
-    bs3_j32d(d, tritIn1, tritIn2, uvrs);
-    polyf3_update32(tritIn1+8, tritIn2+8, uvrs);
+    int32_t delta = *d;
+    bs3_jump32divsteps(delta, tritIn1, tritIn2, uvrs);
+    polyf3_update32(tritIn1+2, tritIn2+2, uvrs);
+    *d = delta;
 }
 
 void polyf3_j64d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
     uint32_t uvrs1[192] = {[0] = 1, [144] = 1}, uvrs2[192] = {[0] = 1, [144] = 1};
-
     polyf3_j32d768(d, tritIn1, tritIn2, uvrs1);
-    polyf3_j32d768(d, tritIn1+8, tritIn2+8, uvrs2);
-    polyf3_mmul32(uvrs, uvrs1, uvrs2);
+    polyf3_j32d768(d, tritIn1+2, tritIn2+2, uvrs2);
 
-    polyf3_update64(tritIn1+16, tritIn2, uvrs);
+    polyf3_mmul32s(uvrs, uvrs1, uvrs2);
 }
 
 void polyf3_j128d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
     uint32_t uvrs1[192] = {[0] = 1, [144] = 1}, uvrs2[192] = {[0] = 1, [144] = 1};
 
     polyf3_j64d768(d, tritIn1, tritIn2, uvrs1);
-    polyf3_j64d768(d, tritIn1+16, tritIn2+16, uvrs2);
-    polyf3_mmul64(uvrs, uvrs1, uvrs2);
+    polyf3_j64d768(d, tritIn1+4, tritIn2+4, uvrs2);
 
-    polyf3_update128(tritIn1+32, tritIn2+32, uvrs);
+    polyf3_mmul64s(uvrs, uvrs1, uvrs2);
 }
 
 void polyf3_j256d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
     uint32_t uvrs1[192] = {[0] = 1, [144] = 1}, uvrs2[192] = {[0] = 1, [144] = 1};
 
     polyf3_j128d768(d, tritIn1, tritIn2, uvrs1);
-    polyf3_j128d768(d, tritIn1+32, tritIn2+32, uvrs2);
-    polyf3_mmul128(uvrs, uvrs1, uvrs2);
+    polyf3_j128d768(d, tritIn1+8, tritIn2+8, uvrs2);
 
-    polyf3_update256(tritIn1+64, tritIn2, uvrs);
+    polyf3_mmul128s(uvrs, uvrs1, uvrs2);
 }
 
-extern void bs3_mul32(uint32_t *, uint32_t *, uint32_t *);
-extern void bs3_mul64(uint32_t *, uint32_t *, uint32_t *);
-extern void bs3_mul128(uint32_t *, uint32_t *, uint32_t *);
-extern void bs3_mul256(uint32_t *, uint32_t *, uint32_t *);
+void polyf3_j512d768(int32_t *d, uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
+    uint32_t uvrs1[192] = {[0] = 1, [144] = 1}, uvrs2[192] = {[0] = 1, [144] = 1};
+
+    polyf3_j256d768(d, tritIn1, tritIn2, uvrs1);
+    polyf3_j256d768(d, tritIn1+16, tritIn2+16, uvrs2);
+
+    polyf3_mmul256s(uvrs, uvrs1, uvrs2);
+}
 
 // 2x2 matrix multiplications
 void polyf3_mmul32(uint32_t *c, uint32_t *a, uint32_t *b) {
@@ -1653,8 +1941,11 @@ void polyf3_mmul32(uint32_t *c, uint32_t *a, uint32_t *b) {
     bs3_mul32(temp+96, s2, r1);
     bs3_mul32(temp+144, s2, s1);
 
-    polyf3_lsl_fast(c);
-    polyf3_add_packed_fast(c, c, temp);
+    //polyf3_add_packed_fast(c, c, temp);
+    polyf3_add64(ures, ures, temp);
+    polyf3_add64(vres, vres, temp+48);
+    polyf3_add64(rres, rres, temp+96);
+    polyf3_add64(sres, sres, temp+144);
 }
 
 void polyf3_mmul64(uint32_t *c, uint32_t *a, uint32_t *b) {
@@ -1672,8 +1963,11 @@ void polyf3_mmul64(uint32_t *c, uint32_t *a, uint32_t *b) {
     bs3_mul64(temp+96, s2, r1);
     bs3_mul64(temp+144, s2, s1);
 
-    polyf3_lsl_fast(c);
-    polyf3_add_packed_fast(c, c, temp);
+    //polyf3_add_packed_fast(c, c, temp);
+    polyf3_add128(ures, ures, temp);
+    polyf3_add128(vres, vres, temp+48);
+    polyf3_add128(rres, rres, temp+96);
+    polyf3_add128(sres, sres, temp+144);
 }
 
 void polyf3_mmul128(uint32_t *c, uint32_t *a, uint32_t *b) {
@@ -1691,8 +1985,11 @@ void polyf3_mmul128(uint32_t *c, uint32_t *a, uint32_t *b) {
     bs3_mul128(temp+96, s2, r1);
     bs3_mul128(temp+144, s2, s1);
 
-    polyf3_lsl_fast(c);
-    polyf3_add_packed_fast(c, c, temp);
+    //polyf3_add_packed_fast(c, c, temp);
+    polyf3_add256(ures, ures, temp);
+    polyf3_add256(vres, vres, temp+48);
+    polyf3_add256(rres, rres, temp+96);
+    polyf3_add256(sres, sres, temp+144);
 }
 
 void polyf3_mmul256(uint32_t *c, uint32_t *a, uint32_t *b) {
@@ -1710,8 +2007,210 @@ void polyf3_mmul256(uint32_t *c, uint32_t *a, uint32_t *b) {
     bs3_mul256(temp+96, s2, r1);
     bs3_mul256(temp+144, s2, s1);
 
-    polyf3_lsl_fast(c);
-    polyf3_add_packed_fast(c, c, temp);
+    //polyf3_add_packed_fast(c, c, temp);
+    polyf3_add512(ures, ures, temp);
+    polyf3_add512(vres, vres, temp+48);
+    polyf3_add512(rres, rres, temp+96);
+    polyf3_add512(sres, sres, temp+144);}
+
+void polyf3_mmul32s(uint32_t *c, uint32_t *a, uint32_t *b) {
+    uint32_t *u1 = a, *v1 = a + 48, *r1 = a + 96, *s1 = a + 144;
+    uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
+    uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
+    uint32_t temp1[96], temp2[48 * 7];
+    // M1
+    polyf3_add32(temp1, u2, s2);
+    polyf3_add32(temp1+48, u1, s1);
+    bs3_mul32(temp2, temp1, temp1+48);
+
+    // M2
+    polyf3_add32(temp1, r2, s2);
+    bs3_mul32(temp2+48, temp1, u1);
+
+    // M3
+    polyf3_sub32(temp1, v1, s1);
+    bs3_mul32(temp2+96, u2, temp1);
+
+    // M4
+    polyf3_sub32(temp1, r1, u1);
+    bs3_mul32(temp2+144, s2, temp1);
+
+    // M5
+    polyf3_add32(temp1, u2, v2);
+    bs3_mul32(temp2+192, temp1, s1);
+
+    // M6
+    polyf3_sub32(temp1, r2, u2);
+    polyf3_add32(temp1+48, u1, v1);
+    bs3_mul32(temp2+240, temp1, temp1+48);
+
+    // M7
+    polyf3_sub32(temp1, v2, s2);
+    polyf3_add32(temp1+48, r1, s1);
+    bs3_mul32(temp2+288, temp1, temp1+48);
+
+    // final
+    polyf3_add64(ures, temp2, temp2+144);
+    polyf3_sub64(ures, ures, temp2+192);
+    polyf3_add64(ures, ures, temp2+288);
+
+    polyf3_add64(vres, temp2+96, temp2+192);
+
+    polyf3_add64(rres, temp2+48, temp2+144);
+
+    polyf3_sub64(sres, temp2, temp2+48);
+    polyf3_add64(sres, sres, temp2+96);
+    polyf3_add64(sres, sres, temp2+240);
+}
+
+void polyf3_mmul64s(uint32_t *c, uint32_t *a, uint32_t *b) {
+    uint32_t *u1 = a, *v1 = a + 48, *r1 = a + 96, *s1 = a + 144;
+    uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
+    uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
+    uint32_t temp1[96], temp2[48 * 7];
+    // M1
+    polyf3_add64(temp1, u2, s2);
+    polyf3_add64(temp1+48, u1, s1);
+    bs3_mul64(temp2, temp1, temp1+48);
+
+    // M2
+    polyf3_add64(temp1, r2, s2);
+    bs3_mul64(temp2+48, temp1, u1);
+
+    // M3
+    polyf3_sub64(temp1, v1, s1);
+    bs3_mul64(temp2+96, u2, temp1);
+
+    // M4
+    polyf3_sub64(temp1, r1, u1);
+    bs3_mul64(temp2+144, s2, temp1);
+
+    // M5
+    polyf3_add64(temp1, u2, v2);
+    bs3_mul64(temp2+192, temp1, s1);
+
+    // M6
+    polyf3_sub64(temp1, r2, u2);
+    polyf3_add64(temp1+48, u1, v1);
+    bs3_mul64(temp2+240, temp1, temp1+48);
+
+    // M7
+    polyf3_sub64(temp1, v2, s2);
+    polyf3_add64(temp1+48, r1, s1);
+    bs3_mul64(temp2+288, temp1, temp1+48);
+
+    // final
+    polyf3_add128(ures, temp2, temp2+144);
+    polyf3_sub128(ures, ures, temp2+192);
+    polyf3_add128(ures, ures, temp2+288);
+
+    polyf3_add128(vres, temp2+96, temp2+192);
+
+    polyf3_add128(rres, temp2+48, temp2+144);
+
+    polyf3_sub128(sres, temp2, temp2+48);
+    polyf3_add128(sres, sres, temp2+96);
+    polyf3_add128(sres, sres, temp2+240);
+}
+
+void polyf3_mmul128s(uint32_t *c, uint32_t *a, uint32_t *b) {
+    uint32_t *u1 = a, *v1 = a + 48, *r1 = a + 96, *s1 = a + 144;
+    uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
+    uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
+    uint32_t temp1[96], temp2[48 * 7];
+    // M1
+    polyf3_add128(temp1, u2, s2);
+    polyf3_add128(temp1+48, u1, s1);
+    bs3_mul128(temp2, temp1, temp1+48);
+
+    // M2
+    polyf3_add128(temp1, r2, s2);
+    bs3_mul128(temp2+48, temp1, u1);
+
+    // M3
+    polyf3_sub128(temp1, v1, s1);
+    bs3_mul128(temp2+96, u2, temp1);
+
+    // M4
+    polyf3_sub128(temp1, r1, u1);
+    bs3_mul128(temp2+144, s2, temp1);
+
+    // M5
+    polyf3_add128(temp1, u2, v2);
+    bs3_mul128(temp2+192, temp1, s1);
+
+    // M6
+    polyf3_sub128(temp1, r2, u2);
+    polyf3_add128(temp1+48, u1, v1);
+    bs3_mul128(temp2+240, temp1, temp1+48);
+
+    // M7
+    polyf3_sub128(temp1, v2, s2);
+    polyf3_add128(temp1+48, r1, s1);
+    bs3_mul128(temp2+288, temp1, temp1+48);
+
+    // final
+    polyf3_add256(ures, temp2, temp2+144);
+    polyf3_sub256(ures, ures, temp2+192);
+    polyf3_add256(ures, ures, temp2+288);
+
+    polyf3_add256(vres, temp2+96, temp2+192);
+
+    polyf3_add256(rres, temp2+48, temp2+144);
+
+    polyf3_sub256(sres, temp2, temp2+48);
+    polyf3_add256(sres, sres, temp2+96);
+    polyf3_add256(sres, sres, temp2+240);
+}
+
+void polyf3_mmul256s(uint32_t *c, uint32_t *a, uint32_t *b) {
+    uint32_t *u1 = a, *v1 = a + 48, *r1 = a + 96, *s1 = a + 144;
+    uint32_t *u2 = b, *v2 = b + 48, *r2 = b + 96, *s2 = b + 144;
+    uint32_t *ures = c, *vres = c + 48, *rres = c + 96, *sres = c + 144;
+    uint32_t temp1[96], temp2[48 * 7];
+    // M1
+    polyf3_add256(temp1, u2, s2);
+    polyf3_add256(temp1+48, u1, s1);
+    bs3_mul256(temp2, temp1, temp1+48);
+
+    // M2
+    polyf3_add256(temp1, r2, s2);
+    bs3_mul256(temp2+48, temp1, u1);
+
+    // M3
+    polyf3_sub256(temp1, v1, s1);
+    bs3_mul256(temp2+96, u2, temp1);
+
+    // M4
+    polyf3_sub256(temp1, r1, u1);
+    bs3_mul256(temp2+144, s2, temp1);
+
+    // M5
+    polyf3_add256(temp1, u2, v2);
+    bs3_mul256(temp2+192, temp1, s1);
+
+    // M6
+    polyf3_sub256(temp1, r2, u2);
+    polyf3_add256(temp1+48, u1, v1);
+    bs3_mul256(temp2+240, temp1, temp1+48);
+
+    // M7
+    polyf3_sub256(temp1, v2, s2);
+    polyf3_add256(temp1+48, r1, s1);
+    bs3_mul256(temp2+288, temp1, temp1+48);
+
+    // final
+    polyf3_add512(ures, temp2, temp2+144);
+    polyf3_sub512(ures, ures, temp2+192);
+    polyf3_add512(ures, ures, temp2+288);
+
+    polyf3_add512(vres, temp2+96, temp2+192);
+
+    polyf3_add512(rres, temp2+48, temp2+144);
+
+    polyf3_sub512(sres, temp2, temp2+48);
+    polyf3_add512(sres, sres, temp2+96);
+    polyf3_add512(sres, sres, temp2+240);
 }
 
 void polyf3_update32(uint32_t *tritIn1, uint32_t *tritIn2, uint32_t uvrs[192]) {
