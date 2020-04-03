@@ -50,6 +50,7 @@ void bs3_sub256(uint32_t *, uint32_t *, uint32_t *);
 void bs3_sub512(uint32_t *, uint32_t *, uint32_t *);
 void bs3_sub768(uint32_t *, uint32_t *, uint32_t *);
 void bs3_mul256x512(uint32_t *, uint32_t *, uint32_t *);
+void bs3_mul512(uint32_t *, uint32_t *, uint32_t *);
 void bs3_mul768(uint32_t *, uint32_t *, uint32_t *);
 
 void polyf3_divstep(int32_t, uint32_t *, uint32_t *);
